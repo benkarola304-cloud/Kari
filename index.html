@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#FFD1DC">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>MochiDrop v5.1 🐱</title>
+    <title>MochiDrop v6.0 📸</title>
     
     <link rel="manifest" href="manifest.json">
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
@@ -13,7 +13,7 @@
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     
     <style>
-        /* --- 样式保持可爱不变 --- */
+        /* --- 样式部分 --- */
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@500;700&display=swap');
         body { font-family: 'Quicksand', sans-serif; background-color: #FFF0F5; color: #555; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
         h1 { font-family: 'Fredoka One', cursive; color: #FF69B4; font-size: 2.2rem; margin-top: 25px; text-shadow: 2px 2px 0px #FFF; }
@@ -48,14 +48,14 @@
 </head>
 <body>
 
-    <h1>MochiDrop v5.1 🐱</h1>
+    <h1>MochiDrop v6.0 📸</h1>
 
     <div class="container">
         <div class="card-header">我的 ID</div>
         <div id="qrcode"></div>
         <br>
         <div id="my-id" class="id-box">...</div>
-        <div class="lan-tip">💡 提示：连同一个 Wi-Fi 可享局域网极速</div>
+        <div class="lan-tip">💡 提示：RW2/JPG 大文件传输优化版</div>
     </div>
 
     <div class="container" id="connect-panel">
@@ -71,7 +71,7 @@
         <div class="card-header">传输队列</div>
         
         <div id="send-section">
-            <label for="file-input" class="file-label">📂 选择多个文件</label>
+            <label for="file-input" class="file-label">📂 选择相片 (RW2/JPG)</label>
             <input type="file" id="file-input" style="display:none" multiple onchange="handleFileSelect(this)">
             <ul id="queue-list" class="file-list"></ul>
             <button class="btn" onclick="processQueue()" id="send-btn" style="display:none;">🚀 开始批量发送</button>
@@ -93,7 +93,10 @@
 
     <script>
         let peer = null; let conn = null; let html5QrCode = null; 
-        const CHUNK_SIZE = 16 * 1024;
+        // 增大缓冲区检测阈值，但减小单次切片，平衡速度与稳定性
+        const CHUNK_SIZE = 16 * 1024; 
+        const MAX_BUFFERED_AMOUNT = 64 * 1024; // 64KB 缓冲区限制 (流控阈值)
+
         let sendQueue = []; let wakeLock = null;
 
         const ui = {
@@ -113,11 +116,9 @@
         });
         peer.on('connection', c => { conn = c; setupConnection("🎉 朋友已连接!"); });
 
-        // Wake Lock
         async function requestWakeLock() { try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} }
         function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
-        // Scan
         function startScan() {
             ui.scan.overlay.style.display = "flex";
             html5QrCode = new Html5Qrcode("reader");
@@ -139,13 +140,14 @@
 
         function setupConnection(msg) {
             showStatus(msg, "success");
-            conn.on('open', () => { showStatus("⚡ P2P 通道已建立 (优先局域网)", "success"); ui.panels.connect.style.display = 'none'; ui.panels.transfer.style.display = 'block'; });
+            conn.on('open', () => { showStatus("⚡ 通道已建立 (已启用流控保护)", "success"); ui.panels.connect.style.display = 'none'; ui.panels.transfer.style.display = 'block'; });
             conn.on('close', () => { showStatus("💔 连接断开", "error"); setTimeout(() => location.reload(), 2000); });
             conn.on('data', handleDataReceived);
         }
 
-        // --- 核心修复：接收数据完整性处理 ---
+        // --- 接收端逻辑 ---
         let incomingFile = { buffer: [], receivedSize: 0, meta: null };
+        
         function handleDataReceived(data) {
             if (data.type === 'header') {
                 incomingFile.buffer = []; incomingFile.receivedSize = 0; incomingFile.meta = data;
@@ -154,18 +156,18 @@
                 requestWakeLock();
             } 
             else if (data.type === 'chunk') {
-                // 🔧 修复逻辑：确保数据是二进制格式
-                // 某些情况下 PeerJS 会把 ArrayBuffer 转成普通对象，导致文件损坏
                 let chunkData = data.data;
-                
-                // 如果接收到的不是 ArrayBuffer 且是对象，说明数据被污染，尝试修复
-                if (!(chunkData instanceof ArrayBuffer) && typeof chunkData === 'object' && !ArrayBuffer.isView(chunkData)) {
-                     // 将对象 {0: x, 1: y...} 转换回 Uint8Array
-                     chunkData = new Uint8Array(Object.values(chunkData));
+                // 深度修复：强制将所有接收数据视为二进制流，防止 RW2/JPG 数据位错乱
+                if (!(chunkData instanceof ArrayBuffer) && typeof chunkData === 'object') {
+                     // 如果数据被序列化成了对象，尝试按索引排序并还原
+                     if(ArrayBuffer.isView(chunkData)) {
+                         chunkData = chunkData.buffer; // 获取底层 buffer
+                     } else {
+                         chunkData = new Uint8Array(Object.values(chunkData)).buffer;
+                     }
                 }
-
                 incomingFile.buffer.push(chunkData);
-                incomingFile.receivedSize += (chunkData.byteLength || chunkData.length);
+                incomingFile.receivedSize += chunkData.byteLength;
                 
                 const percent = Math.floor((incomingFile.receivedSize / incomingFile.meta.fileSize) * 100);
                 updateProgress(percent, "接收中");
@@ -180,22 +182,20 @@
         }
 
         function createDownloadButton(buffers, meta) {
-            const blob = new Blob(buffers, { type: meta.fileType });
+            // RW2 是二进制大文件，必须指定 octet-stream 或对应的 image 类型
+            const blob = new Blob(buffers, { type: meta.fileType || 'application/octet-stream' });
             const url = URL.createObjectURL(blob);
             const btn = document.createElement('a');
             btn.href = url; btn.download = meta.fileName; btn.className = 'download-btn';
             
-            // 提示 HEIC 文件
             let tip = "";
-            if (meta.fileName.toLowerCase().endsWith('.heic')) {
-                tip = "<br><span style='font-size:0.7em; color:#d9534f'>(⚠️ iPhone格式，电脑可能无法预览)</span>";
-            }
+            if (meta.fileName.toLowerCase().endsWith('.rw2')) tip = "<br><span style='font-size:0.7em; color:#d9534f'>(📸 松下 RAW 格式)</span>";
+            else if (meta.fileName.toLowerCase().endsWith('.heic')) tip = "<br><span style='font-size:0.7em; color:#d9534f'>(⚠️ iPhone HEIC)</span>";
             
             btn.innerHTML = `📥 保存: ${meta.fileName} <span style="font-size:0.8em">(${(meta.fileSize/1024/1024).toFixed(2)}MB)</span>${tip}`;
             ui.receive.list.prepend(btn);
         }
 
-        // --- 发送逻辑优化：强制转为 Uint8Array ---
         function handleFileSelect(input) {
             if (input.files && input.files.length > 0) {
                 sendQueue = Array.from(input.files); renderQueueList();
@@ -218,24 +218,35 @@
                 showStatus(`📤 (${i+1}/${sendQueue.length}) 发送中: ${file.name}`, "wait");
                 await sendSingleFile(file);
                 li.classList.add('done'); li.innerHTML += ' ✅';
-                await new Promise(r => setTimeout(r, 500));
+                // 文件之间稍微停顿久一点，给手机写入存储的时间
+                await new Promise(r => setTimeout(r, 800));
             }
             showStatus("✅ 所有文件发送完毕！", "success"); ui.progress.area.style.display = 'none'; releaseWakeLock();
         }
         
+        // --- 核心更新：Backpressure (背压控制) ---
         async function sendSingleFile(file) {
             conn.send({ type: 'header', fileName: file.name, fileType: file.type, fileSize: file.size });
             let offset = 0;
+            
             while (offset < file.size) {
+                // 1. 检查缓冲区：如果浏览器嘴里含着超过 64KB 的数据没发出去，我们就等待
+                if (conn.dataChannel.bufferedAmount > MAX_BUFFERED_AMOUNT) {
+                    await new Promise(r => setTimeout(r, 50)); // 等待 50ms 再检查
+                    continue; // 重新检查，不发送数据
+                }
+
                 const chunk = file.slice(offset, offset + CHUNK_SIZE);
                 const buffer = await chunk.arrayBuffer();
                 
-                // 🔧 修复逻辑：发送时明确转换为 Uint8Array，避免不同浏览器序列化差异
+                // 2. 强制转为 Uint8Array 发送，确保二进制完整性
                 conn.send({ type: 'chunk', data: new Uint8Array(buffer) });
                 
                 offset += CHUNK_SIZE;
                 updateProgress(Math.floor((offset / file.size) * 100), "发送中");
-                if(offset % (CHUNK_SIZE * 5) === 0) await new Promise(r => setTimeout(r, 1));
+                
+                // 3. 极小的延时，防止主线程卡死
+                if(offset % (CHUNK_SIZE * 10) === 0) await new Promise(r => setTimeout(r, 1));
             }
             conn.send({ type: 'end' });
         }
