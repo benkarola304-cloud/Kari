@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#FFD1DC">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>MochiDrop 🐱</title>
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        /* --- 可爱的样式定义 --- */
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@500;700&display=swap');
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #FFF0F5; /* 薰衣草腮红 */
+            color: #555;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            font-family: 'Fredoka One', cursive;
+            color: #FF69B4;
+            font-size: 2.5rem;
+            margin-top: 20px;
+            text-shadow: 2px 2px 0px #FFF;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            border-radius: 30px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(255, 182, 193, 0.4);
+            text-align: center;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .card-header { font-weight: bold; font-size: 1.2rem; margin-bottom: 15px; color: #888; }
+
+        /* 可爱的输入框 */
+        input[type="text"] {
+            width: 70%;
+            padding: 12px;
+            border-radius: 20px;
+            border: 2px solid #FFB6C1;
+            outline: none;
+            text-align: center;
+            font-size: 1.1rem;
+            color: #FF69B4;
+            transition: 0.3s;
+        }
+        input[type="text"]:focus { border-color: #FF69B4; box-shadow: 0 0 8px #FFB6C1; }
+
+        /* 软萌按钮 */
+        .btn {
+            background-color: #FF69B4;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #D14785;
+            transition: all 0.1s;
+            margin: 10px 5px;
+        }
+        .btn:active { transform: translateY(4px); box-shadow: 0 0 0 #D14785; }
+        .btn-secondary { background-color: #87CEEB; box-shadow: 0 4px 0 #5F9EA0; }
+        .btn-secondary:active { box-shadow: 0 0 0 #5F9EA0; }
+
+        /* 状态显示 */
+        #status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        .status-success { background: #E0F8E0; color: #2E8B57; }
+        .status-wait { background: #FFF8DC; color: #DAA520; }
+
+        /* 文件选择美化 */
+        .file-upload {
+            display: none;
+        }
+        .file-label {
+            display: inline-block;
+            background: #FFD1DC;
+            padding: 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            width: 80%;
+            border: 3px dashed #FF69B4;
+            color: #FF69B4;
+            font-weight: bold;
+        }
+        .file-label:hover { background: #FFC0CB; }
+
+        #qrcode { margin: 20px auto; }
+        
+        /* 进度条 */
+        #progress-container { width: 100%; background-color: #f3f3f3; border-radius: 10px; margin-top: 10px; display: none;}
+        #progress-bar { width: 0%; height: 10px; background-color: #FF69B4; border-radius: 10px; transition: width 0.3s;}
+
+    </style>
+</head>
+<body>
+
+    <h1>MochiDrop 🐱</h1>
+
+    <div class="container">
+        <div class="card-header">我是谁 (My ID)</div>
+        <div id="qrcode"></div>
+        <p>你的ID: <span id="my-id" style="font-weight:bold; color:#FF69B4;">生成中...</span></p>
+    </div>
+
+    <div class="container" id="connect-panel">
+        <div class="card-header">连接朋友 (Connect)</div>
+        <input type="text" id="friend-id" placeholder="输入朋友的ID">
+        <br>
+        <button class="btn" onclick="connectToFriend()">🔗 连接 (Link)</button>
+    </div>
+
+    <div class="container" id="transfer-panel" style="display:none;">
+        <div class="card-header">投喂文件 (Send File) 🐹</div>
+        
+        <label for="file-input" class="file-label">
+            📂 点击选择文件
+            <div style="font-size: 0.8rem; margin-top: 5px;">(支持照片/视频/文档)</div>
+        </label>
+        <input type="file" id="file-input" class="file-upload" onchange="handleFileSelect(this)">
+        
+        <div id="selected-file-name" style="margin-top:10px; font-size:0.8rem;"></div>
+        <button class="btn btn-secondary" onclick="sendFile()" id="send-btn" style="display:none; width:80%;">🚀 发送咻咻咻</button>
+        
+        <div id="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+    </div>
+
+    <div id="status"></div>
+
+    <script>
+        // --- 逻辑部分 ---
+        let peer = null;
+        let conn = null;
+        const myIdDisplay = document.getElementById('my-id');
+        const statusDiv = document.getElementById('status');
+        const transferPanel = document.getElementById('transfer-panel');
+        const connectPanel = document.getElementById('connect-panel');
+        
+        // 1. 初始化 PeerJS (自动获取随机ID)
+        // 使用官方免费云服务器，注意：生产环境建议自行部署PeerServer
+        peer = new Peer(null, {
+            debug: 2
+        });
+
+        peer.on('open', function(id) {
+            console.log('My peer ID is: ' + id);
+            // 只显示后4位让输入更简单（虽然有碰撞风险，但做DEMO足够）
+            // 为了稳定，这里还是显示完整ID，或者你可以截取
+            myIdDisplay.innerText = id;
+            
+            // 生成二维码
+            new QRCode(document.getElementById("qrcode"), {
+                text: id,
+                width: 128,
+                height: 128,
+                colorDark : "#FF69B4",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        });
+
+        // 2. 被动连接（我是接收方）
+        peer.on('connection', function(c) {
+            conn = c;
+            setupConnection("🎉 朋友已连接!");
+        });
+
+        // 3. 主动连接（我是发送方）
+        function connectToFriend() {
+            const friendId = document.getElementById('friend-id').value.trim();
+            if(!friendId) return alert("请输入朋友的ID哦~");
+            
+            conn = peer.connect(friendId);
+            setupConnection("🚀 正在连接...");
+        }
+
+        // 设置连接后的处理逻辑
+        function setupConnection(msg) {
+            showStatus(msg, "success");
+            
+            conn.on('open', function() {
+                showStatus("💖 连接成功！可以互传啦", "success");
+                connectPanel.style.display = "none";
+                transferPanel.style.display = "block";
+            });
+
+            // 接收数据
+            conn.on('data', function(data) {
+                if (data.file && data.fileType && data.fileName) {
+                   showStatus("🎁 收到文件: " + data.fileName, "success");
+                   downloadFile(data.file, data.fileName, data.fileType);
+                }
+            });
+            
+            conn.on('close', function(){
+                 showStatus("💔 连接断开了", "wait");
+                 resetUI();
+            });
+        }
+
+        // 4. 文件处理
+        let selectedFile = null;
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                selectedFile = input.files[0];
+                document.getElementById('selected-file-name').innerText = "选定: " + selectedFile.name;
+                document.getElementById('send-btn').style.display = "inline-block";
+            }
+        }
+
+        function sendFile() {
+            if (!conn || !selectedFile) return;
+            
+            showStatus("📤 正在发送...", "wait");
+            const progressBar = document.getElementById('progress-bar');
+            const progressContainer = document.getElementById('progress-container');
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '50%'; // 模拟进度，PeerJS原声不支持进度回调
+
+            // 将文件转换为ArrayBuffer或Blob发送
+            const blob = new Blob([selectedFile], { type: selectedFile.type });
+            
+            conn.send({
+                file: blob,
+                fileName: selectedFile.name,
+                fileType: selectedFile.type
+            });
+
+            setTimeout(() => {
+                progressBar.style.width = '100%';
+                showStatus("✅ 发送完成！", "success");
+                setTimeout(() => { progressContainer.style.display = 'none'; progressBar.style.width = '0%'; }, 1000);
+            }, 500);
+        }
+
+        // 5. 下载文件
+        function downloadFile(data, name, type) {
+            const blob = new Blob([data], { type: type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function showStatus(text, type) {
+            statusDiv.style.display = 'block';
+            statusDiv.className = type === 'success' ? 'status-success' : 'status-wait';
+            statusDiv.innerText = text;
+        }
+        
+        function resetUI() {
+            connectPanel.style.display = "block";
+            transferPanel.style.display = "none";
+        }
+    </script>
+</body>
+</html>
