@@ -18,21 +18,17 @@
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@500;600;700&display=swap');
         
         :root {
-            /* --- 高级配色系统 (Lumina Premium) --- */
-            --bg-page: #F7F9F7;          /* 极浅的灰绿背景 */
-            --bg-card: #FFFFFF;          /* 纯白卡片 */
+            /* --- Lumina Premium 配色 --- */
+            --bg-page: #F7F9F7;
+            --bg-card: #FFFFFF;
+            --text-main: #2C3E50;
+            --text-sub: #95A5A6;
+            --accent-primary: #76A665;
+            --accent-light: #E8F5E9;
+            --accent-hover: #639252;
+            --radius-card: 24px;
+            --radius-btn: 16px;
             
-            --text-main: #2C3E50;        /* 接近黑色的深蓝灰，比纯黑更有质感 */
-            --text-sub: #95A5A6;         /* 浅灰辅助色 */
-            
-            --accent-primary: #76A665;   /* 莫兰迪树懒绿 (主色) */
-            --accent-light: #E8F5E9;     /* 极淡的绿色背景块 */
-            --accent-hover: #639252;     /* 深一点的绿色 */
-            
-            --radius-card: 24px;         /* 卡片圆角 */
-            --radius-btn: 16px;          /* 按钮圆角 (稍微方一点点，更现代) */
-            
-            /* 弥散阴影：高级感的来源 */
             --shadow-float: 0 15px 35px -5px rgba(118, 166, 101, 0.15), 0 5px 15px -8px rgba(0,0,0,0.05);
             --shadow-inner: inset 0 2px 4px rgba(0,0,0,0.02);
         }
@@ -46,24 +42,20 @@
             padding-top: 80px; padding-bottom: 40px;
         }
 
-        /* --- 顶部导航 (极简风) --- */
         .navbar {
             position: fixed; top: 0; left: 0; width: 100%; height: 64px;
-            background: rgba(247, 249, 247, 0.85); /* 与背景同色但半透明 */
+            background: rgba(247, 249, 247, 0.85);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             display: flex; align-items: center; justify-content: center;
             z-index: 1000;
         }
         .navbar-title {
             font-family: 'Fredoka One', cursive; 
-            color: var(--accent-primary); 
-            font-size: 1.4rem; 
-            display: flex; align-items: center; gap: 8px;
-            letter-spacing: 0.5px;
+            color: var(--accent-primary); font-size: 1.4rem; 
+            display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px;
         }
         .navbar-icon { width: 32px; height: 32px; }
 
-        /* --- 卡片通用样式 --- */
         .card { 
             width: 88%; max-width: 420px; 
             background: var(--bg-card);
@@ -80,38 +72,24 @@
             display: block; text-align: left;
         }
 
-        /* --- 1. 身份卡片 (重构：左图右文) --- */
-        .identity-layout {
-            display: flex; align-items: center; gap: 20px;
-        }
-        
-        /* 左侧二维码容器 */
+        /* 身份卡片 (左图右文) */
+        .identity-layout { display: flex; align-items: center; gap: 20px; }
         .qr-container {
-            flex-shrink: 0;
-            width: 100px; height: 100px;
-            background: var(--bg-page);
-            border-radius: 18px;
-            padding: 8px;
+            flex-shrink: 0; width: 100px; height: 100px;
+            background: var(--bg-page); border-radius: 18px; padding: 8px;
             display: flex; align-items: center; justify-content: center;
         }
         #qrcode img { display: block; width: 100%; height: auto; }
-
-        /* 右侧信息容器 */
         .info-container {
-            flex-grow: 1;
-            display: flex; flex-direction: column; justify-content: center;
-            text-align: left;
-            overflow: hidden; /* 防止长ID撑破 */
+            flex-grow: 1; display: flex; flex-direction: column; justify-content: center;
+            text-align: left; overflow: hidden;
         }
-        
         .id-label { font-size: 0.8rem; color: var(--text-sub); margin-bottom: 4px; }
         .id-value {
             font-family: 'Quicksand', monospace;
             font-size: 1.2rem; font-weight: 700; color: var(--text-main);
             word-break: break-all; line-height: 1.3;
         }
-        
-        /* 在线状态小圆点 */
         .status-badge {
             display: inline-flex; align-items: center; gap: 6px;
             margin-top: 8px; font-size: 0.75rem; 
@@ -121,34 +99,29 @@
         }
         .status-dot { width: 8px; height: 8px; background: var(--accent-primary); border-radius: 50%; }
 
-        /* --- 2. 连接卡片 --- */
+        /* 连接卡片 */
         .input-wrapper {
             position: relative; margin-bottom: 12px;
             display: flex; align-items: center;
             background: var(--bg-page); border-radius: var(--radius-btn);
             padding: 4px 6px 4px 16px;
             box-shadow: var(--shadow-inner);
-            border: 1px solid transparent;
-            transition: 0.3s;
+            border: 1px solid transparent; transition: 0.3s;
         }
         .input-wrapper:focus-within { background: #FFF; border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(118, 166, 101, 0.15); }
-
         input[type="text"] {
             flex: 1; border: none; background: transparent; outline: none;
             font-size: 1rem; font-weight: 600; color: var(--text-main);
             padding: 12px 0; font-family: 'Quicksand', sans-serif;
         }
         input::placeholder { color: #BDC3C7; font-weight: 500; }
-
         .btn-scan-mini {
             width: 40px; height: 40px; border-radius: 12px;
             background: #FFF; border: none; cursor: pointer;
             font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); color: #555;
-            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); color: #555; transition: 0.2s;
         }
         .btn-scan-mini:active { transform: scale(0.9); background: var(--accent-light); }
-
         .btn-primary {
             width: 100%; padding: 16px; border: none; border-radius: var(--radius-btn);
             background: var(--accent-primary); color: white;
@@ -158,46 +131,46 @@
         }
         .btn-primary:active { transform: scale(0.98); background: var(--accent-hover); box-shadow: none; }
 
-        /* --- 3. 传输区域 --- */
+        /* --- 传输区域 (增加拖拽交互) --- */
         .upload-zone {
             border: 2px dashed #D6E4D0; border-radius: var(--radius-card);
-            background: #FAFCFA; padding: 30px 20px; cursor: pointer;
+            background: #FAFCFA; padding: 40px 20px; cursor: pointer;
             display: flex; flex-direction: column; align-items: center;
             transition: 0.3s;
         }
-        .upload-zone:active { background: var(--accent-light); border-color: var(--accent-primary); }
-        .upload-icon { font-size: 2rem; color: var(--accent-primary); margin-bottom: 10px; opacity: 0.8;}
-        .upload-text { font-size: 0.9rem; color: var(--text-sub); font-weight: 600; }
-
-        /* 文件列表 (极简列表) */
-        .file-list { list-style: none; padding: 0; margin: 20px 0 0 0; max-height: 200px; overflow-y: auto;}
-        .file-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px; border-bottom: 1px solid #F0F0F0;
+        /* 拖拽悬停状态 */
+        .upload-zone.drag-over {
+            background: var(--accent-light);
+            border-color: var(--accent-primary);
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(118, 166, 101, 0.2);
         }
+        
+        .upload-icon { font-size: 2.2rem; color: var(--accent-primary); margin-bottom: 12px; opacity: 0.8;}
+        .upload-text { font-size: 0.95rem; color: var(--text-sub); font-weight: 600; }
+        .upload-subtext { font-size: 0.75rem; color: var(--text-sub); opacity: 0.6; margin-top: 5px;}
+
+        .file-list { list-style: none; padding: 0; margin: 20px 0 0 0; max-height: 200px; overflow-y: auto;}
+        .file-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-bottom: 1px solid #F0F0F0; }
         .file-item:last-child { border-bottom: none; }
         .file-icon { font-size: 1.2rem; }
         .file-name { flex: 1; font-size: 0.9rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;}
         .file-status { font-size: 0.8rem; color: var(--text-sub); }
         .file-item.done .file-status { color: var(--accent-primary); font-weight: bold; }
 
-        /* 下载按钮 */
         .download-btn {
             display: flex; align-items: center; gap: 10px;
             background: #FFF; border: 1px solid var(--accent-primary);
             color: var(--accent-primary); padding: 12px 16px;
             border-radius: 12px; text-decoration: none; margin-bottom: 10px;
-            font-weight: 700; font-size: 0.9rem;
-            transition: 0.2s;
+            font-weight: 700; font-size: 0.9rem; transition: 0.2s;
         }
         .download-btn:active { background: var(--accent-light); }
 
-        /* 进度条 */
         .progress-bar-container { width: 100%; height: 6px; background: #EDF2ED; border-radius: 10px; overflow: hidden; margin-top: 20px; display: none;}
         .progress-bar-fill { height: 100%; width: 0%; background: var(--accent-primary); border-radius: 10px; transition: width 0.2s; }
         .progress-text { font-size: 0.75rem; color: var(--text-sub); margin-top: 8px; text-align: right;}
 
-        /* 全局状态提示 */
         #status-toast {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             background: rgba(44, 62, 80, 0.9); color: white;
@@ -208,7 +181,6 @@
             white-space: nowrap;
         }
 
-        /* 扫码层 (全屏毛玻璃) */
         #scan-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
@@ -259,9 +231,10 @@
         <span class="card-label">TRANSFER</span>
         
         <div id="send-section">
-            <label for="file-input" class="upload-zone">
+            <label for="file-input" class="upload-zone" id="drop-zone">
                 <div class="upload-icon">📂</div>
-                <div class="upload-text">Tap to select files</div>
+                <div class="upload-text">Click or Drag Files Here</div>
+                <div class="upload-subtext">Support folders drag & drop</div>
             </label>
             <input type="file" id="file-input" style="display:none" multiple onchange="handleFileSelect(this)">
             
@@ -281,7 +254,6 @@
     </div>
 
     <div id="status-toast"></div>
-
     <div id="scan-overlay">
         <div id="reader"></div>
         <button class="btn-close-scan" onclick="stopScan()">✕</button>
@@ -293,7 +265,6 @@
         const MAX_BUFFERED_AMOUNT = 32 * 1024; 
         let sendQueue = []; let wakeLock = null;
 
-        // UI References
         const ui = {
             myId: document.getElementById('my-id'), 
             toast: document.getElementById('status-toast'),
@@ -303,7 +274,8 @@
             input: document.getElementById('friend-id'),
             send: { btn: document.getElementById('send-btn'), list: document.getElementById('queue-list'), section: document.getElementById('send-section') },
             receive: { section: document.getElementById('receive-section'), list: document.getElementById('received-list') },
-            progress: { area: document.getElementById('progress-area'), bar: document.getElementById('progress-bar'), text: document.getElementById('progress-text') }
+            progress: { area: document.getElementById('progress-area'), bar: document.getElementById('progress-bar'), text: document.getElementById('progress-text') },
+            dropZone: document.getElementById('drop-zone')
         };
 
         // --- Core Logic ---
@@ -312,7 +284,6 @@
             peer.on('open', id => {
                 ui.myId.innerText = id;
                 ui.statusText.innerText = "Online";
-                // Generate QR
                 const qrContainer = document.getElementById("qrcode"); qrContainer.innerHTML = "";
                 setTimeout(() => {
                     new QRCode(qrContainer, { text: id, width: 84, height: 84, colorDark : "#2C3E50", colorLight : "#F7F9F7", correctLevel : QRCode.CorrectLevel.L });
@@ -325,6 +296,101 @@
         async function requestWakeLock() { try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} }
         function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
+        // --- Drag & Drop + Folder Recursion Logic ---
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            ui.dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+        function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            ui.dropZone.addEventListener(eventName, () => ui.dropZone.classList.add('drag-over'), false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            ui.dropZone.addEventListener(eventName, () => ui.dropZone.classList.remove('drag-over'), false);
+        });
+
+        ui.dropZone.addEventListener('drop', handleDrop, false);
+
+        async function handleDrop(e) {
+            let dt = e.dataTransfer;
+            // Modern Directory scanning
+            if (dt.items) {
+                let items = dt.items;
+                for (let i = 0; i < items.length; i++) {
+                    let item = items[i].webkitGetAsEntry ? items[i].webkitGetAsEntry() : items[i].getAsEntry ? items[i].getAsEntry() : null;
+                    if (item) {
+                        await traverseFileTree(item);
+                    } else if (items[i].kind === 'file') {
+                        let file = items[i].getAsFile();
+                        addFileToQueue(file);
+                    }
+                }
+            } else {
+                // Fallback for simple file drop
+                handleFiles(dt.files);
+            }
+            updateSendUI();
+        }
+
+        async function traverseFileTree(item, path = "") {
+            if (item.isFile) {
+                // Get file
+                return new Promise(resolve => {
+                    item.file(file => {
+                        addFileToQueue(file);
+                        resolve();
+                    });
+                });
+            } else if (item.isDirectory) {
+                // Get folder contents
+                let dirReader = item.createReader();
+                return new Promise(resolve => {
+                    dirReader.readEntries(async entries => {
+                        for (let entry of entries) {
+                            await traverseFileTree(entry, path + item.name + "/");
+                        }
+                        resolve();
+                    });
+                });
+            }
+        }
+
+        function addFileToQueue(file) {
+            sendQueue.push(file);
+        }
+
+        function handleFiles(files) {
+            for (let i = 0; i < files.length; i++) {
+                addFileToQueue(files[i]);
+            }
+        }
+
+        function updateSendUI() {
+            if (sendQueue.length > 0) {
+                renderQueueList();
+                ui.send.btn.style.display = 'block'; 
+                ui.send.btn.innerText = `Send ${sendQueue.length} Files`;
+            }
+        }
+
+        // --- Standard File Input ---
+        function handleFileSelect(input) {
+            if (input.files && input.files.length > 0) {
+                handleFiles(input.files);
+                updateSendUI();
+            }
+        }
+
+        function renderQueueList() {
+            ui.send.list.innerHTML = "";
+            sendQueue.forEach((file, index) => {
+                const li = document.createElement('li'); li.className = 'file-item'; li.id = `file-item-${index}`;
+                li.innerHTML = `<span class="file-icon">📄</span><span class="file-name">${file.name}</span><span class="file-status">Wait</span>`;
+                ui.send.list.appendChild(li);
+            });
+        }
+
+        // --- Common Logic ---
         function startScan() {
             ui.scan.overlay.style.display = "flex";
             html5QrCode = new Html5Qrcode("reader");
@@ -391,20 +457,6 @@
             ui.receive.list.prepend(btn);
         }
 
-        function handleFileSelect(input) {
-            if (input.files && input.files.length > 0) {
-                sendQueue = Array.from(input.files); renderQueueList();
-                ui.send.btn.style.display = 'block'; ui.send.btn.innerText = `Send ${sendQueue.length} Files`;
-            }
-        }
-        function renderQueueList() {
-            ui.send.list.innerHTML = "";
-            sendQueue.forEach((file, index) => {
-                const li = document.createElement('li'); li.className = 'file-item'; li.id = `file-item-${index}`;
-                li.innerHTML = `<span class="file-icon">📄</span><span class="file-name">${file.name}</span><span class="file-status">Wait</span>`;
-                ui.send.list.appendChild(li);
-            });
-        }
         async function processQueue() {
             if (!conn || sendQueue.length === 0) return;
             ui.send.btn.style.display = 'none'; ui.progress.area.style.display = 'block'; requestWakeLock();
