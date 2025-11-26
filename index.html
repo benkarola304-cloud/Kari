@@ -531,4 +531,14 @@
         async function requestWakeLock() { try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} }
         function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
         function createDownloadButton(url, name) { const btn = document.createElement('a'); btn.href = url; btn.download = name; btn.className = 'download-btn'; btn.innerHTML = `<span>📥 ${name}</span>`; ui.receive.list.prepend(btn); }
-        function handleFileSelect(input) { if(input
+        function handleFileSelect(input) { if(input.files.length) { handleFiles(input.files); updateSendUI(); } }
+        function addFileToQueue(file) { sendQueue.push(file); }
+        function handleFiles(files) { for(let i=0; i<files.length; i++) addFileToQueue(files[i]); }
+        function updateSendUI() { if(sendQueue.length > 0) { ui.send.list.innerHTML = ""; sendQueue.forEach((f, i) => { const li = document.createElement('li'); li.className = 'file-item'; li.id = `f-${i}`; li.innerHTML = `<span class="file-icon">📄</span><span class="file-name">${f.name}</span><span class="file-status">Wait</span>`; ui.send.list.appendChild(li); }); ui.send.btn.style.display = 'block'; ui.send.btn.innerText = `Send ${sendQueue.length} Files`; }}
+        async function processQueue() { if(!conn || !sendQueue.length) return; ui.send.btn.style.display = 'none'; ui.progress.area.style.display = 'block'; requestWakeLock(); for(let i=0; i<sendQueue.length; i++) { const li = document.getElementById(`f-${i}`); showToast(`Sending ${i+1}/${sendQueue.length}`); if(li) li.querySelector('.file-status').innerText = "Sending..."; await sendSingleFile(sendQueue[i]); if(li) { li.classList.add('done'); li.querySelector('.file-status').innerText = "Done"; } await new Promise(r=>setTimeout(r,500)); } showToast("Sent!"); setTimeout(()=>ui.progress.area.style.display='none',1000); releaseWakeLock(); sendQueue=[]; }
+        async function sendSingleFile(file) { conn.send({type:'header',fileName:file.name,fileType:file.type,fileSize:file.size, fromChat: false}); let offset=0; while(offset<file.size){ if(conn.dataChannel.bufferedAmount>MAX_BUFFERED_AMOUNT){ await new Promise(r=>setTimeout(r,50)); continue; } const chunk = file.slice(offset,offset+CHUNK_SIZE); const buffer = await chunk.arrayBuffer(); conn.send(new Uint8Array(buffer)); offset+=CHUNK_SIZE; if(offset%(CHUNK_SIZE*20)===0) updateProgress(Math.floor((offset/file.size)*100)); await new Promise(r=>setTimeout(r,2)); } conn.send({type:'end'}); }
+        function updateProgress(p) { ui.progress.bar.style.width = p+'%'; ui.progress.text.innerText = p+'%'; }
+        function showToast(t) { ui.toast.innerText = t; ui.toast.style.display = 'block'; ui.toast.style.animation = 'pop 0.3s ease'; setTimeout(()=>ui.toast.style.display='none',3000); }
+    </script>
+</body>
+</html>
