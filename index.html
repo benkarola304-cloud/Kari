@@ -37,8 +37,8 @@
         .navbar { position: fixed; top: 0; left: 0; width: 100%; height: 64px; background: rgba(247, 249, 247, 0.85); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; z-index: 1000; box-shadow: 0 1px 0 rgba(0,0,0,0.05);}
         .navbar-title { font-family: 'Fredoka One', cursive; color: var(--accent-primary); font-size: 1.4rem; display: flex; align-items: center; gap: 8px; }
         .navbar-icon { width: 32px; height: 32px; }
-        .card { width: 88%; max-width: 420px; background: var(--bg-card); border-radius: var(--radius-card); padding: 24px; box-shadow: var(--shadow-float); margin-bottom: 24px; transition: transform 0.2s; }
-        .card-label { font-size: 0.75rem; color: var(--text-sub); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .card { width: 88%; max-width: 420px; background: var(--bg-card); border-radius: var(--radius-card); padding: 24px; box-shadow: var(--shadow-float); margin-bottom: 24px; }
+        .card-label { font-size: 0.75rem; color: var(--text-sub); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; display: block; text-align: left; }
         
         /* Identity */
         .identity-layout { display: flex; align-items: center; gap: 20px; }
@@ -50,37 +50,21 @@
         .status-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 0.75rem; color: var(--accent-primary); font-weight: 600; background: var(--accent-light); padding: 4px 10px; border-radius: 20px; align-self: flex-start; }
         .status-dot { width: 8px; height: 8px; background: var(--accent-primary); border-radius: 50%; }
 
-        /* Connect & Save Button */
+        /* Connect */
         .input-wrapper { position: relative; margin-bottom: 12px; display: flex; align-items: center; background: var(--bg-page); border-radius: var(--radius-btn); padding: 4px 6px 4px 16px; box-shadow: var(--shadow-inner); }
         input[type="text"] { flex: 1; border: none; background: transparent; outline: none; font-size: 1rem; font-weight: 600; color: var(--text-main); padding: 12px 0; }
         .btn-scan-mini { width: 40px; height: 40px; border-radius: 12px; background: #FFF; border: none; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .btn-primary { width: 100%; padding: 16px; border: none; border-radius: var(--radius-btn); background: var(--accent-primary); color: white; font-size: 1rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(118, 166, 101, 0.4); transition: 0.2s; }
         .btn-primary:active { transform: scale(0.98); background: var(--accent-hover); }
-        
-        /* Save Friend Button (Visible only when connected) */
-        #btn-save-friend { display: none; margin-top: 10px; background: #F9C74F; color: #FFF; border:none; padding: 10px; border-radius: 12px; width: 100%; font-weight: 700; cursor: pointer; box-shadow: 0 4px 10px rgba(249, 199, 79, 0.4); }
 
-        /* Friends List UI */
-        .friend-list { list-style: none; padding: 0; margin: 0; }
-        .friend-item { display: flex; align-items: center; padding: 12px; background: var(--bg-page); border-radius: 16px; margin-bottom: 10px; transition: 0.2s; cursor: pointer; border: 2px solid transparent;}
-        .friend-item:active { transform: scale(0.98); }
-        .friend-item.active { border-color: var(--accent-primary); background: #F0F9F0; }
-        .friend-avatar { width: 40px; height: 40px; background: #FFF; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-right: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative;}
-        .friend-status-dot { position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #CCC; border-radius: 50%; border: 2px solid #FFF; }
-        .friend-item.active .friend-status-dot { background: #4CAF50; box-shadow: 0 0 0 2px #C8E6C9; }
-        .friend-info { flex: 1; text-align: left; }
-        .friend-name { font-weight: 700; font-size: 0.95rem; color: var(--text-main); }
-        .friend-id { font-size: 0.7rem; color: var(--text-sub); font-family: monospace; }
-        .friend-actions { display: flex; gap: 8px; }
-        .btn-icon-small { width: 32px; height: 32px; border-radius: 50%; border: none; background: #FFF; color: #999; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .btn-icon-small:hover { color: var(--text-main); }
-
-        /* Transfer & Chat (Same as V1.7) */
+        /* Transfer */
         .upload-zone { border: 2px dashed #D6E4D0; border-radius: var(--radius-card); background: #FAFCFA; padding: 40px 20px; cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.3s; }
+        .upload-zone.drag-over { background: var(--accent-light); border-color: var(--accent-primary); transform: scale(1.02); }
         .file-list { list-style: none; padding: 0; margin: 20px 0 0 0; max-height: 200px; overflow-y: auto;}
         .file-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-bottom: 1px solid #F0F0F0; }
         .file-name { flex: 1; font-size: 0.9rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left;}
         .file-status { font-size: 0.8rem; color: var(--text-sub); }
+        .file-item.done .file-status { color: var(--accent-primary); font-weight: bold; }
         .progress-bar-container { width: 100%; height: 6px; background: #EDF2ED; border-radius: 10px; overflow: hidden; margin-top: 20px; display: none;}
         .progress-bar-fill { height: 100%; width: 0%; background: var(--accent-primary); transition: width 0.2s; }
         .download-btn { display: flex; align-items: center; gap: 10px; background: #FFF; border: 1px solid var(--accent-primary); color: var(--accent-primary); padding: 12px 16px; border-radius: 12px; text-decoration: none; margin-bottom: 10px; font-weight: 700; font-size: 0.9rem; }
@@ -96,26 +80,33 @@
         #chat-modal { position: fixed; bottom: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: none; align-items: flex-end; justify-content: center; }
         .chat-container { width: 100%; max-width: 500px; height: 85vh; background: #F2F4F2; border-radius: 24px 24px 0 0; display: flex; flex-direction: column; box-shadow: 0 -10px 40px rgba(0,0,0,0.2); overflow: hidden; animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
         .chat-header { padding: 15px 20px; background: #FFF; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E0E0E0;}
         .chat-title { font-weight: 700; color: var(--text-main); font-size: 1.1rem; }
         .btn-close-chat { background: #F5F5F5; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: bold; color: #666;}
+        
         .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
         .message { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 0.95rem; line-height: 1.4; word-break: break-word; position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
         .msg-self { align-self: flex-end; background: var(--chat-bubble-self); color: white; border-bottom-right-radius: 4px; }
         .msg-friend { align-self: flex-start; background: var(--chat-bubble-friend); color: var(--text-main); border-bottom-left-radius: 4px; }
+        
         .msg-img { max-width: 200px; border-radius: 12px; cursor: zoom-in; display: block; background: #eee; margin-top: 5px;}
         .file-bubble { display: flex; flex-direction: column; gap: 5px; min-width: 180px; }
         .file-bubble-info { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.9rem; }
         .chat-progress-bg { width: 100%; height: 4px; background: rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden; margin-top: 5px;}
         .chat-progress-fill { height: 100%; width: 0%; background: rgba(255,255,255,0.8); transition: width 0.2s; }
         .msg-friend .chat-progress-fill { background: var(--accent-primary); }
+
         .chat-footer { padding: 12px; background: #FFF; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #E0E0E0;}
         .chat-input-row { display: flex; align-items: center; gap: 8px; }
         .chat-input { flex: 1; padding: 12px 15px; border-radius: 20px; border: 1px solid #EEE; outline: none; background: #F9F9F9; height: 46px; box-sizing: border-box; font-size: 1rem; }
         .chat-btn-icon { width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; background: #F0F0F0; color: #555; transition: 0.2s; flex-shrink: 0;}
+        .chat-btn-icon:hover { background: #E0E0E0; }
         .btn-send-chat { background: var(--accent-primary); color: white; }
+        
         .emoji-picker { display: none; grid-template-columns: repeat(8, 1fr); gap: 5px; padding: 10px; background: #F9F9F9; border-radius: 12px; max-height: 150px; overflow-y: auto; margin-bottom: 5px;}
         .emoji-item { font-size: 1.4rem; cursor: pointer; text-align: center; padding: 5px; border-radius: 5px; }
+        .emoji-item:hover { background: #EEE; }
 
         #status-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(44, 62, 80, 0.9); color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.15); backdrop-filter: blur(10px); display: none; z-index: 2000; white-space: nowrap; }
         #scan-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(25px); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
@@ -128,6 +119,7 @@
 </head>
 <body onclick="unlockAudio()">
 
+    <audio id="notify-sound" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"></audio>
     <audio id="silent-audio" loop><source src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//oeAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMD//////////////////////////////////////////////////////////////////wAAAP//OgAAAAAAAABMYXZjNTguMTM0LjEwMAAAAAAAAAAAAAAA//oeAAAAAAABIAAAAAAAAAAAAAAA//oeAAAAAAAAAAAAAAAAAAAAAAA=" type="audio/mpeg"></audio>
 
     <div class="navbar">
@@ -146,22 +138,13 @@
         </div>
     </div>
 
-    <div class="card" id="friends-panel">
-        <span class="card-label">SAVED DEVICES (Tap to Connect)</span>
-        <ul class="friend-list" id="friends-list">
-            <li style="text-align:center; padding:10px; color:#999; font-size:0.85rem;">No saved friends yet.</li>
-        </ul>
-    </div>
-
     <div class="card" id="connect-panel">
-        <span class="card-label">NEW CONNECTION</span>
+        <span class="card-label">CONNECT DEVICE</span>
         <div class="input-wrapper">
-            <input type="text" id="friend-id" placeholder="Enter ID to connect" autocomplete="off">
+            <input type="text" id="friend-id" placeholder="Enter Friend's ID" autocomplete="off">
             <button class="btn-scan-mini" onclick="startScan()">📷</button>
         </div>
-        <button class="btn-primary" onclick="connectToFriend()">Connect Now</button>
-        
-        <button id="btn-save-friend" onclick="saveCurrentFriend()">⭐️ Save This Device</button>
+        <button class="btn-primary" onclick="connectToFriend()">Connect</button>
     </div>
 
     <div class="card" id="transfer-panel" style="display:none;">
@@ -193,14 +176,14 @@
                 <button class="btn-close-chat" onclick="toggleChat()">✕</button>
             </div>
             <div class="chat-messages" id="chat-messages">
-                <div style="text-align:center; color:#999; font-size:0.8rem; margin-top:20px;">Connected securely.</div>
+                <div style="text-align:center; color:#999; font-size:0.8rem; margin-top:20px;">Connected. Drop files here to send.</div>
             </div>
             <div class="chat-footer">
                 <div class="emoji-picker" id="emoji-picker"></div>
                 <div class="chat-input-row">
                     <button class="chat-btn-icon" onclick="document.getElementById('chat-file-input').click()">📎</button>
                     <button class="chat-btn-icon" onclick="toggleEmoji()">😊</button>
-                    <input type="text" class="chat-input" id="chat-input" placeholder="Type..." autocomplete="off">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Type a message..." autocomplete="off">
                     <button class="chat-btn-icon btn-send-chat" onclick="sendTextMessage()">➤</button>
                 </div>
                 <input type="file" id="chat-file-input" style="display:none" multiple onchange="handleChatFileSelect(this)">
@@ -215,8 +198,7 @@
     <script>
         let peer = null; let conn = null; let html5QrCode = null; 
         const CHUNK_SIZE = 4 * 1024; const MAX_BUFFERED_AMOUNT = 32 * 1024; 
-        let sendQueue = []; let wakeLock = null; let heartbeatTimer = null; 
-        let currentConnectedPeerId = null; // Track current connection
+        let sendQueue = []; let wakeLock = null; let heartbeatTimer = null;
 
         const ui = {
             myId: document.getElementById('my-id'), toast: document.getElementById('status-toast'),
@@ -227,198 +209,181 @@
             send: { btn: document.getElementById('send-btn'), list: document.getElementById('queue-list'), section: document.getElementById('send-section') },
             receive: { section: document.getElementById('receive-section'), list: document.getElementById('received-list') },
             dropZone: document.getElementById('drop-zone'),
+            // Chat
             fabWrapper: document.getElementById('fab-wrapper'), fabChat: document.getElementById('fab-chat'), fabToast: document.getElementById('fab-toast'),
             chatModal: document.getElementById('chat-modal'), chatMessages: document.getElementById('chat-messages'),
             chatInput: document.getElementById('chat-input'), emojiPicker: document.getElementById('emoji-picker'),
             lightbox: document.getElementById('lightbox'), lightboxImg: document.getElementById('lightbox-img'),
-            audio: document.getElementById('silent-audio'),
-            // Friends UI
-            btnSave: document.getElementById('btn-save-friend'),
-            friendsList: document.getElementById('friends-list')
+            audio: document.getElementById('silent-audio')
         };
 
-        // --- Init ---
+        // --- Initialization ---
         try {
             peer = new Peer(null, { debug: 1 });
             peer.on('open', id => {
                 ui.myId.innerText = id; ui.statusText.innerText = "Online";
-                setTimeout(() => { new QRCode(document.getElementById("qrcode"), { text: id, width: 84, height: 84, colorDark : "#2C3E50", colorLight : "#F7F9F7", correctLevel : QRCode.CorrectLevel.L }); }, 200);
-                renderFriendsList(); // Load friends on start
+                const qrContainer = document.getElementById("qrcode"); qrContainer.innerHTML = "";
+                // Fix: Ensure DOM is ready and ID is valid before drawing QR
+                setTimeout(() => {
+                    try {
+                        new QRCode(qrContainer, { text: id, width: 84, height: 84, colorDark : "#2C3E50", colorLight : "#F7F9F7", correctLevel : QRCode.CorrectLevel.L });
+                    } catch(e) { console.error("QR Fail"); }
+                }, 200);
             });
-            peer.on('error', err => { showToast("Network Error"); ui.statusText.innerText = "Offline"; });
+            peer.on('error', err => { showToast("Network Error"); ui.myId.innerText = "Connect Failed"; ui.statusText.innerText = "Offline"; });
             peer.on('connection', c => { conn = c; setupConnection(); });
-        } catch(e) { alert("Init Failed"); }
+        } catch(e) { alert("PeerJS Init Failed"); }
 
+        // --- Functions ---
         function unlockAudio() { ui.audio.play().catch(()=>{}); document.body.onclick = null; }
         function playNotification() { 
-            try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const o = ctx.createOscillator(); const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value=800; g.gain.value=0.1; o.start(); o.stop(ctx.currentTime+0.2); } catch(e){}
+            // Simple beep tone
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator(); const gain = ctx.createGain();
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.frequency.value = 800; gain.gain.value = 0.1;
+                osc.start(); osc.stop(ctx.currentTime + 0.2);
+            } catch(e){}
             if(navigator.vibrate) navigator.vibrate(200);
         }
         function notifyUser(msg) {
-            if (ui.chatModal.style.display === 'none') { playNotification(); ui.fabToast.innerText = msg; ui.fabToast.style.display = 'block'; document.getElementById('fab-chat').classList.add('animate-pulse'); }
+            if (ui.chatModal.style.display === 'none') {
+                playNotification();
+                ui.fabToast.innerText = msg; ui.fabToast.style.display = 'block';
+                document.getElementById('fab-chat').classList.add('animate-pulse');
+            }
         }
 
-        // --- Connection & Friends Logic ---
         function setupConnection() {
             conn.on('open', () => { 
                 showToast("Connected!"); ui.statusText.innerText = "Linked";
-                ui.panels.connect.style.display = 'block'; // Keep visible for "Save" button
-                ui.panels.transfer.style.display = 'block';
+                ui.panels.connect.style.display = 'none'; ui.panels.transfer.style.display = 'block';
                 ui.fabWrapper.style.display = 'flex';
-                
-                currentConnectedPeerId = conn.peer;
-                ui.btnSave.style.display = "block"; // Show save button
-                ui.btnSave.innerText = isFriend(conn.peer) ? "✅ Device Saved" : "⭐️ Save This Device";
-                
-                updateFriendStatus(conn.peer, true); // Mark as online in list
-
                 if(heartbeatTimer) clearInterval(heartbeatTimer);
-                heartbeatTimer = setInterval(() => { if(conn?.open) conn.send({type: 'ping'}); }, 1000);
+                heartbeatTimer = setInterval(() => { if(conn?.open) conn.send({type: 'ping'}); }, 2000);
             });
-            conn.on('close', () => { 
-                showToast("Disconnected"); 
-                updateFriendStatus(currentConnectedPeerId, false);
-                ui.btnSave.style.display = "none";
-                setTimeout(() => location.reload(), 2000); 
-            });
+            conn.on('close', () => { showToast("Disconnected"); setTimeout(() => location.reload(), 2000); });
             conn.on('data', handleDataReceived);
         }
 
-        // --- LocalStorage Friends System ---
-        function getFriends() {
-            const stored = localStorage.getItem('mochi_friends');
-            return stored ? JSON.parse(stored) : [];
-        }
-
-        function isFriend(id) {
-            const friends = getFriends();
-            return friends.some(f => f.id === id);
-        }
-
-        function saveCurrentFriend() {
-            if (!currentConnectedPeerId) return;
-            if (isFriend(currentConnectedPeerId)) {
-                showToast("Already saved!");
-                return;
-            }
-            
-            const name = prompt("Enter a name for this device (e.g., My Pixel):", "New Friend");
-            if (name) {
-                const friends = getFriends();
-                friends.push({ id: currentConnectedPeerId, name: name, date: Date.now() });
-                localStorage.setItem('mochi_friends', JSON.stringify(friends));
-                showToast("Device Saved!");
-                ui.btnSave.innerText = "✅ Device Saved";
-                renderFriendsList();
-                updateFriendStatus(currentConnectedPeerId, true);
-            }
-        }
-
-        function deleteFriend(id, e) {
-            e.stopPropagation();
-            if(confirm("Remove this device?")) {
-                let friends = getFriends();
-                friends = friends.filter(f => f.id !== id);
-                localStorage.setItem('mochi_friends', JSON.stringify(friends));
-                renderFriendsList();
-            }
-        }
-
-        function renderFriendsList() {
-            const friends = getFriends();
-            ui.friendsList.innerHTML = "";
-            
-            if (friends.length === 0) {
-                ui.friendsList.innerHTML = '<li style="text-align:center; padding:10px; color:#999; font-size:0.85rem;">No saved devices yet.<br>Connect once to save.</li>';
-                return;
-            }
-
-            friends.forEach(f => {
-                const li = document.createElement('li');
-                li.className = 'friend-item';
-                li.id = `friend-${f.id}`;
-                li.onclick = () => connectToSaved(f.id);
-                li.innerHTML = `
-                    <div class="friend-avatar">🦥<div class="friend-status-dot"></div></div>
-                    <div class="friend-info">
-                        <div class="friend-name">${f.name}</div>
-                        <div class="friend-id">ID: ${f.id.substring(0,8)}...</div>
-                    </div>
-                    <div class="friend-actions">
-                        <button class="btn-icon-small" onclick="deleteFriend('${f.id}', event)">🗑️</button>
-                    </div>
-                `;
-                ui.friendsList.appendChild(li);
-            });
-            
-            // Re-apply status if currently connected
-            if (currentConnectedPeerId && conn && conn.open) {
-                updateFriendStatus(currentConnectedPeerId, true);
-            }
-        }
-
-        function updateFriendStatus(id, isOnline) {
-            const item = document.getElementById(`friend-${id}`);
-            if (item) {
-                if (isOnline) item.classList.add('active');
-                else item.classList.remove('active');
-            }
-        }
-
-        function connectToSaved(id) {
-            ui.input.value = id;
-            connectToFriend();
-        }
-
-        // --- Core Logic (Same as V1.8) ---
         let incomingFile = { buffer: [], receivedSize: 0, meta: null, fileId: null };
+        
         function handleDataReceived(data) {
             if (data.type === 'ping') return;
+
             if (data instanceof ArrayBuffer || data instanceof Uint8Array) {
                 if(!incomingFile.meta) return;
                 const chunk = new Uint8Array(data);
                 incomingFile.buffer.push(chunk);
                 incomingFile.receivedSize += chunk.byteLength;
+                
                 if (incomingFile.meta.fromChat) updateChatProgress(incomingFile.fileId, incomingFile.receivedSize, incomingFile.meta.fileSize);
             } 
             else if (data.type) {
                 if (data.type === 'header') {
-                    incomingFile.buffer = []; incomingFile.receivedSize = 0; incomingFile.meta = data; incomingFile.fileId = data.fileId || Date.now();
-                    if (data.fromChat) { createFileBubble(incomingFile.fileId, data.fileName, 'friend'); notifyUser("Receiving File..."); } 
-                    else { showToast(`Receiving: ${data.fileName}`); }
+                    incomingFile.buffer = []; incomingFile.receivedSize = 0; incomingFile.meta = data;
+                    incomingFile.fileId = data.fileId || Date.now();
+                    
+                    if (data.fromChat) {
+                        createFileBubble(incomingFile.fileId, data.fileName, 'friend');
+                        notifyUser("Receiving File...");
+                    } else {
+                        showToast(`Receiving: ${data.fileName}`);
+                    }
                     requestWakeLock();
                 } 
                 else if (data.type === 'end') {
                     const blob = new Blob(incomingFile.buffer, { type: incomingFile.meta.fileType || 'application/octet-stream' });
                     const url = URL.createObjectURL(blob);
-                    if (incomingFile.meta.fromChat) { finishFileBubble(incomingFile.fileId, url, incomingFile.meta.fileName, incomingFile.meta.fileType, false); notifyUser("File Received!"); } 
-                    else { createDownloadButton(url, incomingFile.meta.fileName); showToast("Download Ready"); }
+                    
+                    if (incomingFile.meta.fromChat) {
+                        finishFileBubble(incomingFile.fileId, url, incomingFile.meta.fileName, incomingFile.meta.fileType, false);
+                        notifyUser("File Received!");
+                    } else {
+                        createDownloadButton(url, incomingFile.meta.fileName);
+                        showToast("Download Ready");
+                    }
                     incomingFile.buffer = []; incomingFile.meta = null; releaseWakeLock();
                 }
-                else if (data.type === 'chat-text') { appendMessage(data.text, 'friend'); notifyUser("New Message"); }
+                else if (data.type === 'chat-text') {
+                    appendMessage(data.text, 'friend');
+                    notifyUser("New Message");
+                }
             }
         }
 
-        // --- Chat & File Logic ---
+        // --- Chat ---
         const emojis = ["😀","😂","😍","😭","👍","🙏","🎉","❤️","🤔","😎","👋","🔥"];
-        emojis.forEach(e => { let span = document.createElement('div'); span.className = 'emoji-item'; span.innerText = e; span.onclick = () => { ui.chatInput.value += e; ui.chatInput.focus(); }; ui.emojiPicker.appendChild(span); });
-        function toggleChat() { const isHidden = ui.chatModal.style.display === 'none'; ui.chatModal.style.display = isHidden ? 'flex' : 'none'; if (isHidden) { ui.fabToast.style.display = 'none'; document.getElementById('fab-chat').classList.remove('animate-pulse'); ui.chatInput.focus(); } }
+        emojis.forEach(e => {
+            let span = document.createElement('div'); span.className = 'emoji-item'; span.innerText = e;
+            span.onclick = () => { ui.chatInput.value += e; ui.chatInput.focus(); };
+            ui.emojiPicker.appendChild(span);
+        });
+        function toggleChat() {
+            const isHidden = ui.chatModal.style.display === 'none';
+            ui.chatModal.style.display = isHidden ? 'flex' : 'none';
+            if (isHidden) { ui.fabToast.style.display = 'none'; document.getElementById('fab-chat').classList.remove('animate-pulse'); ui.chatInput.focus(); }
+        }
         function toggleEmoji() { ui.emojiPicker.style.display = ui.emojiPicker.style.display === 'grid' ? 'none' : 'grid'; }
         ui.chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendTextMessage(); } });
-        function sendTextMessage() { const text = ui.chatInput.value.trim(); if (!text || !conn) return; conn.send({ type: 'chat-text', text: text }); appendMessage(text, 'self'); ui.chatInput.value = ""; ui.emojiPicker.style.display = 'none'; }
-        function appendMessage(content, sender) { const div = document.createElement('div'); div.className = `message msg-${sender}`; div.innerText = content; ui.chatMessages.appendChild(div); ui.chatMessages.scrollTop = ui.chatMessages.scrollHeight; }
+
+        function sendTextMessage() {
+            const text = ui.chatInput.value.trim();
+            if (!text || !conn) return;
+            conn.send({ type: 'chat-text', text: text });
+            appendMessage(text, 'self');
+            ui.chatInput.value = ""; ui.emojiPicker.style.display = 'none';
+        }
+        function appendMessage(content, sender) {
+            const div = document.createElement('div'); div.className = `message msg-${sender}`;
+            div.innerText = content;
+            ui.chatMessages.appendChild(div); ui.chatMessages.scrollTop = ui.chatMessages.scrollHeight;
+        }
+
+        // --- Chat File Logic ---
         function handleChatFileSelect(input) { if(input.files.length > 0) for(let i=0; i<input.files.length; i++) sendChatFile(input.files[i]); }
-        async function sendChatFile(file) { const fileId = Date.now() + Math.random().toString(16).slice(2); createFileBubble(fileId, file.name, 'self'); conn.send({ type: 'header', fileName: file.name, fileType: file.type, fileSize: file.size, fromChat: true, fileId: fileId }); let offset = 0; while (offset < file.size) { if (conn.dataChannel.bufferedAmount > MAX_BUFFERED_AMOUNT) { await new Promise(r => setTimeout(r, 50)); continue; } const chunk = file.slice(offset, offset + CHUNK_SIZE); const buffer = await chunk.arrayBuffer(); conn.send(new Uint8Array(buffer)); offset += CHUNK_SIZE; updateChatProgress(fileId, offset, file.size); await new Promise(r => setTimeout(r, 2)); } conn.send({ type: 'end' }); finishFileBubble(fileId, null, file.name, file.type, true); }
-        function createFileBubble(id, name, sender) { const div = document.createElement('div'); div.className = `message msg-${sender}`; div.id = `bubble-${id}`; div.innerHTML = `<div class="file-bubble"><div class="file-bubble-info"><span style="font-size:1.2rem">📄</span> <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px;">${name}</span></div><div class="chat-progress-bg"><div class="chat-progress-fill" style="width:0%"></div></div></div>`; ui.chatMessages.appendChild(div); ui.chatMessages.scrollTop = ui.chatMessages.scrollHeight; }
-        function updateChatProgress(id, current, total) { const bubble = document.getElementById(`bubble-${id}`); if (bubble) bubble.querySelector('.chat-progress-fill').style.width = Math.min(100, Math.floor((current/total)*100)) + "%"; }
-        function finishFileBubble(id, url, name, type, isSender) { const bubble = document.getElementById(`bubble-${id}`); if (!bubble) return; if (type.startsWith('image/') && url) { bubble.innerHTML = `<img src="${url}" class="msg-img" onclick="openLightbox('${url}')">`; } else { bubble.innerHTML = isSender ? `<div class="file-bubble-info" style="opacity:0.8"><span>✅ Sent: ${name}</span></div>` : `<div class="file-bubble-info" onclick="saveChatFile('${url}', '${name}')" style="cursor:pointer"><span style="font-size:1.2rem">📥</span> <span style="text-decoration:underline">Save: ${name}</span></div>`; } }
+        
+        async function sendChatFile(file) {
+            const fileId = Date.now() + Math.random().toString(16).slice(2);
+            createFileBubble(fileId, file.name, 'self');
+            conn.send({ type: 'header', fileName: file.name, fileType: file.type, fileSize: file.size, fromChat: true, fileId: fileId });
+            
+            let offset = 0;
+            while (offset < file.size) {
+                if (conn.dataChannel.bufferedAmount > MAX_BUFFERED_AMOUNT) { await new Promise(r => setTimeout(r, 50)); continue; }
+                const chunk = file.slice(offset, offset + CHUNK_SIZE);
+                const buffer = await chunk.arrayBuffer();
+                conn.send(new Uint8Array(buffer));
+                offset += CHUNK_SIZE;
+                updateChatProgress(fileId, offset, file.size);
+                await new Promise(r => setTimeout(r, 2));
+            }
+            conn.send({ type: 'end' });
+            finishFileBubble(fileId, null, file.name, file.type, true);
+        }
+
+        function createFileBubble(id, name, sender) {
+            const div = document.createElement('div'); div.className = `message msg-${sender}`; div.id = `bubble-${id}`;
+            div.innerHTML = `<div class="file-bubble"><div class="file-bubble-info"><span style="font-size:1.2rem">📄</span> <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px;">${name}</span></div><div class="chat-progress-bg"><div class="chat-progress-fill" style="width:0%"></div></div></div>`;
+            ui.chatMessages.appendChild(div); ui.chatMessages.scrollTop = ui.chatMessages.scrollHeight;
+        }
+        function updateChatProgress(id, current, total) {
+            const bubble = document.getElementById(`bubble-${id}`);
+            if (bubble) bubble.querySelector('.chat-progress-fill').style.width = Math.min(100, Math.floor((current/total)*100)) + "%";
+        }
+        function finishFileBubble(id, url, name, type, isSender) {
+            const bubble = document.getElementById(`bubble-${id}`); if (!bubble) return;
+            if (type.startsWith('image/') && url) {
+                bubble.innerHTML = `<img src="${url}" class="msg-img" onclick="openLightbox('${url}')">`;
+            } else {
+                bubble.innerHTML = isSender ? `<div class="file-bubble-info" style="opacity:0.8"><span>✅ Sent: ${name}</span></div>` : `<div class="file-bubble-info" onclick="saveChatFile('${url}', '${name}')" style="cursor:pointer"><span style="font-size:1.2rem">📥</span> <span style="text-decoration:underline">Save: ${name}</span></div>`;
+            }
+        }
         window.saveChatFile = (url, name) => { const a = document.createElement('a'); a.href = url; a.download = name; a.click(); };
         function openLightbox(src) { ui.lightboxImg.src = src; ui.lightbox.style.display = 'flex'; }
-        
-        // Common Logic
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => { ui.dropZone.addEventListener(e, ev => {ev.preventDefault(); ev.stopPropagation();}); ui.chatMessages.addEventListener(e, ev => {ev.preventDefault(); ev.stopPropagation();}); });
-        ui.dropZone.addEventListener('drop', e => handleDrop(e, false)); ui.chatMessages.addEventListener('drop', e => handleDrop(e, true));
-        async function handleDrop(e, fromChat) { let dt = e.dataTransfer; if (dt.files.length) { for (let i = 0; i < dt.files.length; i++) { if(fromChat) sendChatFile(dt.files[i]); else addFileToQueue(dt.files[i]); } if(!fromChat) updateSendUI(); } }
+
+        // --- Common Logic ---
         function startScan() { ui.scan.overlay.style.display = "flex"; html5QrCode = new Html5Qrcode("reader"); html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: { width: 250, height: 250 } }, t => { ui.input.value = t; stopScan(); showToast("Scanned"); }, () => {}).catch(() => { showToast("Camera Error"); stopScan(); }); }
         function stopScan() { if(html5QrCode?.isScanning) html5QrCode.stop().then(() => { html5QrCode.clear(); ui.scan.overlay.style.display = "none"; }); else ui.scan.overlay.style.display = "none"; }
         function connectToFriend() { const id = ui.input.value.trim(); if(!id) return showToast("Enter ID"); conn = peer.connect(id, { reliable: true }); showToast("Connecting..."); setupConnection(); }
@@ -432,6 +397,12 @@
         async function processQueue() { if(!conn || !sendQueue.length) return; ui.send.btn.style.display = 'none'; requestWakeLock(); for(let i=0; i<sendQueue.length; i++) { const li = document.getElementById(`f-${i}`); showToast(`Sending ${i+1}/${sendQueue.length}`); if(li) li.querySelector('.file-status').innerText = "Sending..."; await sendSingleFile(sendQueue[i]); if(li) { li.classList.add('done'); li.querySelector('.file-status').innerText = "Done"; } await new Promise(r=>setTimeout(r,500)); } showToast("All Sent!"); releaseWakeLock(); sendQueue=[]; }
         async function sendSingleFile(file) { conn.send({type:'header',fileName:file.name,fileType:file.type,fileSize:file.size, fromChat: false}); let offset=0; while(offset<file.size){ if(conn.dataChannel.bufferedAmount>MAX_BUFFERED_AMOUNT){ await new Promise(r=>setTimeout(r,50)); continue; } const chunk = file.slice(offset,offset+CHUNK_SIZE); const buffer = await chunk.arrayBuffer(); conn.send(new Uint8Array(buffer)); offset+=CHUNK_SIZE; await new Promise(r=>setTimeout(r,2)); } conn.send({type:'end'}); }
         function showToast(t) { ui.toast.innerText = t; ui.toast.style.display = 'block'; ui.toast.style.animation = 'pop 0.3s ease'; setTimeout(()=>ui.toast.style.display='none',3000); }
+        
+        // Drag Drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => { ui.dropZone.addEventListener(e, ev => {ev.preventDefault(); ev.stopPropagation();}); ui.chatMessages.addEventListener(e, ev => {ev.preventDefault(); ev.stopPropagation();}); });
+        ui.dropZone.addEventListener('drop', e => handleDrop(e, false));
+        ui.chatMessages.addEventListener('drop', e => handleDrop(e, true));
+        async function handleDrop(e, fromChat) { let dt = e.dataTransfer; if (dt.files.length) { for (let i = 0; i < dt.files.length; i++) { if(fromChat) sendChatFile(dt.files[i]); else addFileToQueue(dt.files[i]); } if(!fromChat) updateSendUI(); } }
     </script>
 </body>
 </html>
