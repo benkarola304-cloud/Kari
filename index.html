@@ -18,7 +18,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@500;600;700&display=swap');
         
         :root {
-            /* --- Lumina Premium 配色 --- */
             --bg-page: #F7F9F7;
             --bg-card: #FFFFFF;
             --text-main: #2C3E50;
@@ -28,9 +27,10 @@
             --accent-hover: #639252;
             --radius-card: 24px;
             --radius-btn: 16px;
-            
             --shadow-float: 0 15px 35px -5px rgba(118, 166, 101, 0.15), 0 5px 15px -8px rgba(0,0,0,0.05);
             --shadow-inner: inset 0 2px 4px rgba(0,0,0,0.02);
+            --chat-bubble-self: #76A665;
+            --chat-bubble-friend: #F0F2F5;
         }
 
         body { 
@@ -42,110 +42,33 @@
             padding-top: 80px; padding-bottom: 40px;
         }
 
-        .navbar {
-            position: fixed; top: 0; left: 0; width: 100%; height: 64px;
-            background: rgba(247, 249, 247, 0.85);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 1000;
-        }
-        .navbar-title {
-            font-family: 'Fredoka One', cursive; 
-            color: var(--accent-primary); font-size: 1.4rem; 
-            display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px;
-        }
+        /* --- 基础 UI (V1.4 样式保持) --- */
+        .navbar { position: fixed; top: 0; left: 0; width: 100%; height: 64px; background: rgba(247, 249, 247, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .navbar-title { font-family: 'Fredoka One', cursive; color: var(--accent-primary); font-size: 1.4rem; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px; }
         .navbar-icon { width: 32px; height: 32px; }
-
-        .card { 
-            width: 88%; max-width: 420px; 
-            background: var(--bg-card);
-            border-radius: var(--radius-card); 
-            padding: 24px; 
-            box-shadow: var(--shadow-float);
-            margin-bottom: 24px;
-            transition: transform 0.2s ease;
-        }
+        .card { width: 88%; max-width: 420px; background: var(--bg-card); border-radius: var(--radius-card); padding: 24px; box-shadow: var(--shadow-float); margin-bottom: 24px; transition: transform 0.2s ease; }
+        .card-label { font-size: 0.75rem; color: var(--text-sub); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; display: block; text-align: left; }
         
-        .card-label {
-            font-size: 0.75rem; color: var(--text-sub); font-weight: 700; 
-            text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px;
-            display: block; text-align: left;
-        }
-
-        /* 身份卡片 (左图右文) */
         .identity-layout { display: flex; align-items: center; gap: 20px; }
-        .qr-container {
-            flex-shrink: 0; width: 100px; height: 100px;
-            background: var(--bg-page); border-radius: 18px; padding: 8px;
-            display: flex; align-items: center; justify-content: center;
-        }
+        .qr-container { flex-shrink: 0; width: 100px; height: 100px; background: var(--bg-page); border-radius: 18px; padding: 8px; display: flex; align-items: center; justify-content: center; }
         #qrcode img { display: block; width: 100%; height: auto; }
-        .info-container {
-            flex-grow: 1; display: flex; flex-direction: column; justify-content: center;
-            text-align: left; overflow: hidden;
-        }
+        .info-container { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; text-align: left; overflow: hidden; }
         .id-label { font-size: 0.8rem; color: var(--text-sub); margin-bottom: 4px; }
-        .id-value {
-            font-family: 'Quicksand', monospace;
-            font-size: 1.2rem; font-weight: 700; color: var(--text-main);
-            word-break: break-all; line-height: 1.3;
-        }
-        .status-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            margin-top: 8px; font-size: 0.75rem; 
-            color: var(--accent-primary); font-weight: 600;
-            background: var(--accent-light); padding: 4px 10px; border-radius: 20px;
-            align-self: flex-start;
-        }
+        .id-value { font-family: 'Quicksand', monospace; font-size: 1.2rem; font-weight: 700; color: var(--text-main); word-break: break-all; line-height: 1.3; }
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 0.75rem; color: var(--accent-primary); font-weight: 600; background: var(--accent-light); padding: 4px 10px; border-radius: 20px; align-self: flex-start; }
         .status-dot { width: 8px; height: 8px; background: var(--accent-primary); border-radius: 50%; }
 
-        /* 连接卡片 */
-        .input-wrapper {
-            position: relative; margin-bottom: 12px;
-            display: flex; align-items: center;
-            background: var(--bg-page); border-radius: var(--radius-btn);
-            padding: 4px 6px 4px 16px;
-            box-shadow: var(--shadow-inner);
-            border: 1px solid transparent; transition: 0.3s;
-        }
+        .input-wrapper { position: relative; margin-bottom: 12px; display: flex; align-items: center; background: var(--bg-page); border-radius: var(--radius-btn); padding: 4px 6px 4px 16px; box-shadow: var(--shadow-inner); border: 1px solid transparent; transition: 0.3s; }
         .input-wrapper:focus-within { background: #FFF; border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(118, 166, 101, 0.15); }
-        input[type="text"] {
-            flex: 1; border: none; background: transparent; outline: none;
-            font-size: 1rem; font-weight: 600; color: var(--text-main);
-            padding: 12px 0; font-family: 'Quicksand', sans-serif;
-        }
+        input[type="text"] { flex: 1; border: none; background: transparent; outline: none; font-size: 1rem; font-weight: 600; color: var(--text-main); padding: 12px 0; font-family: 'Quicksand', sans-serif; }
         input::placeholder { color: #BDC3C7; font-weight: 500; }
-        .btn-scan-mini {
-            width: 40px; height: 40px; border-radius: 12px;
-            background: #FFF; border: none; cursor: pointer;
-            font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); color: #555; transition: 0.2s;
-        }
+        .btn-scan-mini { width: 40px; height: 40px; border-radius: 12px; background: #FFF; border: none; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); color: #555; transition: 0.2s; }
         .btn-scan-mini:active { transform: scale(0.9); background: var(--accent-light); }
-        .btn-primary {
-            width: 100%; padding: 16px; border: none; border-radius: var(--radius-btn);
-            background: var(--accent-primary); color: white;
-            font-size: 1rem; font-weight: 700; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(118, 166, 101, 0.4);
-            transition: all 0.2s ease; letter-spacing: 0.5px;
-        }
+        .btn-primary { width: 100%; padding: 16px; border: none; border-radius: var(--radius-btn); background: var(--accent-primary); color: white; font-size: 1rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(118, 166, 101, 0.4); transition: all 0.2s ease; letter-spacing: 0.5px; }
         .btn-primary:active { transform: scale(0.98); background: var(--accent-hover); box-shadow: none; }
 
-        /* --- 传输区域 (增加拖拽交互) --- */
-        .upload-zone {
-            border: 2px dashed #D6E4D0; border-radius: var(--radius-card);
-            background: #FAFCFA; padding: 40px 20px; cursor: pointer;
-            display: flex; flex-direction: column; align-items: center;
-            transition: 0.3s;
-        }
-        /* 拖拽悬停状态 */
-        .upload-zone.drag-over {
-            background: var(--accent-light);
-            border-color: var(--accent-primary);
-            transform: scale(1.02);
-            box-shadow: 0 0 15px rgba(118, 166, 101, 0.2);
-        }
-        
+        .upload-zone { border: 2px dashed #D6E4D0; border-radius: var(--radius-card); background: #FAFCFA; padding: 40px 20px; cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.3s; }
+        .upload-zone.drag-over { background: var(--accent-light); border-color: var(--accent-primary); transform: scale(1.02); box-shadow: 0 0 15px rgba(118, 166, 101, 0.2); }
         .upload-icon { font-size: 2.2rem; color: var(--accent-primary); margin-bottom: 12px; opacity: 0.8;}
         .upload-text { font-size: 0.95rem; color: var(--text-sub); font-weight: 600; }
         .upload-subtext { font-size: 0.75rem; color: var(--text-sub); opacity: 0.6; margin-top: 5px;}
@@ -157,41 +80,109 @@
         .file-name { flex: 1; font-size: 0.9rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;}
         .file-status { font-size: 0.8rem; color: var(--text-sub); }
         .file-item.done .file-status { color: var(--accent-primary); font-weight: bold; }
-
-        .download-btn {
-            display: flex; align-items: center; gap: 10px;
-            background: #FFF; border: 1px solid var(--accent-primary);
-            color: var(--accent-primary); padding: 12px 16px;
-            border-radius: 12px; text-decoration: none; margin-bottom: 10px;
-            font-weight: 700; font-size: 0.9rem; transition: 0.2s;
-        }
+        .download-btn { display: flex; align-items: center; gap: 10px; background: #FFF; border: 1px solid var(--accent-primary); color: var(--accent-primary); padding: 12px 16px; border-radius: 12px; text-decoration: none; margin-bottom: 10px; font-weight: 700; font-size: 0.9rem; transition: 0.2s; }
         .download-btn:active { background: var(--accent-light); }
-
         .progress-bar-container { width: 100%; height: 6px; background: #EDF2ED; border-radius: 10px; overflow: hidden; margin-top: 20px; display: none;}
         .progress-bar-fill { height: 100%; width: 0%; background: var(--accent-primary); border-radius: 10px; transition: width 0.2s; }
         .progress-text { font-size: 0.75rem; color: var(--text-sub); margin-top: 8px; text-align: right;}
 
-        #status-toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: rgba(44, 62, 80, 0.9); color: white;
-            padding: 12px 24px; border-radius: 50px;
-            font-size: 0.9rem; font-weight: 600;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            backdrop-filter: blur(10px); display: none; z-index: 2000;
-            white-space: nowrap;
+        #status-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(44, 62, 80, 0.9); color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.15); backdrop-filter: blur(10px); display: none; z-index: 2000; white-space: nowrap; }
+        #scan-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        #reader { width: 80vw; max-width: 350px; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+        .btn-close-scan { margin-top: 40px; width: 50px; height: 50px; border-radius: 50%; background: #F1F1F1; color: #333; border: none; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        /* --- 🆕 聊天功能样式 --- */
+        
+        /* 悬浮按钮 (FAB) */
+        #fab-chat {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 60px; height: 60px; border-radius: 30px;
+            background: var(--accent-primary); color: white;
+            box-shadow: 0 10px 25px rgba(118, 166, 101, 0.4);
+            border: none; cursor: pointer; display: none; /* 连接后显示 */
+            align-items: center; justify-content: center; font-size: 1.8rem;
+            z-index: 1500; transition: transform 0.2s;
+        }
+        #fab-chat:active { transform: scale(0.9); }
+        #fab-badge {
+            position: absolute; top: 0; right: 0; width: 14px; height: 14px;
+            background: #FF5252; border-radius: 50%; border: 2px solid white;
+            display: none;
         }
 
-        #scan-overlay {
+        /* 聊天窗口 (Modal) */
+        #chat-modal {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 2000;
+            display: none; align-items: flex-end; justify-content: center;
+        }
+        .chat-container {
+            width: 100%; max-width: 500px; height: 85vh;
+            background: #FFF; border-radius: 24px 24px 0 0;
+            display: flex; flex-direction: column;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+            animation: slideUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        /* 聊天头部 */
+        .chat-header {
+            padding: 15px 20px; border-bottom: 1px solid #F0F0F0;
+            display: flex; align-items: center; justify-content: space-between;
+            background: #FFF; z-index: 10;
+        }
+        .chat-title { font-weight: 700; color: var(--text-main); font-size: 1.1rem; display: flex; align-items: center; gap: 8px;}
+        .btn-close-chat { background: #F5F5F5; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; color: #666; font-weight: bold;}
+
+        /* 聊天内容区 */
+        .chat-messages {
+            flex: 1; padding: 20px; overflow-y: auto; background: var(--bg-page);
+            display: flex; flex-direction: column; gap: 15px;
+        }
+        .chat-messages.drag-over { background: #E8F5E9; box-shadow: inset 0 0 20px rgba(118, 166, 101, 0.2); }
+
+        .message { max-width: 80%; padding: 10px 15px; border-radius: 18px; font-size: 0.95rem; line-height: 1.4; position: relative; word-break: break-word;}
+        .msg-self { align-self: flex-end; background: var(--chat-bubble-self); color: white; border-bottom-right-radius: 4px; }
+        .msg-friend { align-self: flex-start; background: var(--chat-bubble-friend); color: var(--text-main); border-bottom-left-radius: 4px; }
+        
+        .msg-img { max-width: 100%; border-radius: 10px; cursor: zoom-in; display: block; margin-top: 5px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background: white;}
+        .msg-info { font-size: 0.7rem; opacity: 0.8; margin-top: 4px; display: block; text-align: right; }
+        .msg-file-bubble { display: flex; align-items: center; gap: 10px; background: white; padding: 8px; border-radius: 12px; margin-top: 5px; color: #333;}
+
+        /* 聊天底部 */
+        .chat-footer {
+            padding: 10px; background: #FFF; border-top: 1px solid #F0F0F0;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .chat-input-row { display: flex; align-items: center; gap: 10px; }
+        .chat-input {
+            flex: 1; padding: 12px 15px; border-radius: 20px; border: 1px solid #EEE;
+            outline: none; font-family: 'Quicksand', sans-serif; font-size: 1rem;
+            background: #F9F9F9; resize: none; height: 44px; box-sizing: border-box;
+        }
+        .btn-emoji, .btn-send-chat { width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;}
+        .btn-emoji { background: #F0F0F0; color: #555; }
+        .btn-send-chat { background: var(--accent-primary); color: white; }
+
+        /* 表情面板 */
+        .emoji-picker {
+            display: none; grid-template-columns: repeat(8, 1fr); gap: 5px;
+            padding: 10px; background: #F9F9F9; border-radius: 12px;
+            max-height: 150px; overflow-y: auto;
+        }
+        .emoji-item { font-size: 1.5rem; cursor: pointer; text-align: center; padding: 5px; border-radius: 5px; }
+        .emoji-item:hover { background: #EEE; }
+
+        /* 图片放大预览 (Lightbox) */
+        #lightbox {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.9); z-index: 3000;
+            display: none; align-items: center; justify-content: center;
         }
-        #reader { width: 80vw; max-width: 350px; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
-        .btn-close-scan {
-            margin-top: 40px; width: 50px; height: 50px; border-radius: 50%;
-            background: #F1F1F1; color: #333; border: none; font-size: 1.2rem;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-        }
+        #lightbox img { max-width: 95%; max-height: 95%; border-radius: 5px; box-shadow: 0 0 50px rgba(255,255,255,0.1);}
+        #lightbox .close-lb { position: absolute; top: 20px; right: 20px; color: white; font-size: 2rem; cursor: pointer; }
+
     </style>
 </head>
 <body>
@@ -210,10 +201,7 @@
             <div class="info-container">
                 <div class="id-label">Device ID</div>
                 <div class="id-value" id="my-id">...</div>
-                <div class="status-badge">
-                    <span class="status-dot"></span>
-                    <span id="connection-status">Ready</span>
-                </div>
+                <div class="status-badge"><span class="status-dot"></span><span id="connection-status">Ready</span></div>
             </div>
         </div>
     </div>
@@ -253,6 +241,39 @@
         <div class="progress-text" id="progress-text"></div>
     </div>
 
+    <button id="fab-chat" onclick="toggleChat()">
+        💬
+        <div id="fab-badge"></div>
+    </button>
+
+    <div id="chat-modal">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title">💬 Chat <span style="font-size:0.8rem; color:#999; font-weight:normal;">(Drag files here to send)</span></div>
+                <button class="btn-close-chat" onclick="toggleChat()">✕</button>
+            </div>
+            
+            <div class="chat-messages" id="chat-messages">
+                <div style="text-align:center; color:#999; font-size:0.8rem; margin-top:20px;">Start chatting...</div>
+            </div>
+            
+            <div class="chat-footer">
+                <div class="emoji-picker" id="emoji-picker">
+                    </div>
+                <div class="chat-input-row">
+                    <button class="btn-emoji" onclick="toggleEmoji()">😊</button>
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Type a message..." autocomplete="off">
+                    <button class="btn-send-chat" onclick="sendTextMessage()">➤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="lightbox" onclick="this.style.display='none'">
+        <div class="close-lb">✕</div>
+        <img id="lightbox-img" src="">
+    </div>
+
     <div id="status-toast"></div>
     <div id="scan-overlay">
         <div id="reader"></div>
@@ -261,13 +282,11 @@
 
     <script>
         let peer = null; let conn = null; let html5QrCode = null; 
-        const CHUNK_SIZE = 4 * 1024; 
-        const MAX_BUFFERED_AMOUNT = 32 * 1024; 
+        const CHUNK_SIZE = 4 * 1024; const MAX_BUFFERED_AMOUNT = 32 * 1024; 
         let sendQueue = []; let wakeLock = null;
 
         const ui = {
-            myId: document.getElementById('my-id'), 
-            toast: document.getElementById('status-toast'),
+            myId: document.getElementById('my-id'), toast: document.getElementById('status-toast'),
             statusText: document.getElementById('connection-status'),
             panels: { connect: document.getElementById('connect-panel'), transfer: document.getElementById('transfer-panel') },
             scan: { overlay: document.getElementById('scan-overlay') },
@@ -275,19 +294,25 @@
             send: { btn: document.getElementById('send-btn'), list: document.getElementById('queue-list'), section: document.getElementById('send-section') },
             receive: { section: document.getElementById('receive-section'), list: document.getElementById('received-list') },
             progress: { area: document.getElementById('progress-area'), bar: document.getElementById('progress-bar'), text: document.getElementById('progress-text') },
-            dropZone: document.getElementById('drop-zone')
+            dropZone: document.getElementById('drop-zone'),
+            // Chat UI
+            fabChat: document.getElementById('fab-chat'),
+            chatModal: document.getElementById('chat-modal'),
+            chatMessages: document.getElementById('chat-messages'),
+            chatInput: document.getElementById('chat-input'),
+            emojiPicker: document.getElementById('emoji-picker'),
+            fabBadge: document.getElementById('fab-badge'),
+            lightbox: document.getElementById('lightbox'),
+            lightboxImg: document.getElementById('lightbox-img')
         };
 
-        // --- Core Logic ---
+        // --- Core & Connection ---
         try {
             peer = new Peer(null, { debug: 1 });
             peer.on('open', id => {
-                ui.myId.innerText = id;
-                ui.statusText.innerText = "Online";
+                ui.myId.innerText = id; ui.statusText.innerText = "Online";
                 const qrContainer = document.getElementById("qrcode"); qrContainer.innerHTML = "";
-                setTimeout(() => {
-                    new QRCode(qrContainer, { text: id, width: 84, height: 84, colorDark : "#2C3E50", colorLight : "#F7F9F7", correctLevel : QRCode.CorrectLevel.L });
-                }, 100);
+                setTimeout(() => { new QRCode(qrContainer, { text: id, width: 84, height: 84, colorDark : "#2C3E50", colorLight : "#F7F9F7", correctLevel : QRCode.CorrectLevel.L }); }, 100);
             });
             peer.on('error', err => { showToast("Error: " + err.type); ui.statusText.innerText = "Offline"; });
             peer.on('connection', c => { conn = c; setupConnection(); });
@@ -296,127 +321,89 @@
         async function requestWakeLock() { try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} }
         function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
-        // --- Drag & Drop + Folder Recursion Logic ---
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            ui.dropZone.addEventListener(eventName, preventDefaults, false);
-        });
-        function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
-        
-        ['dragenter', 'dragover'].forEach(eventName => {
-            ui.dropZone.addEventListener(eventName, () => ui.dropZone.classList.add('drag-over'), false);
-        });
-        ['dragleave', 'drop'].forEach(eventName => {
-            ui.dropZone.addEventListener(eventName, () => ui.dropZone.classList.remove('drag-over'), false);
+        // --- Chat Logic ---
+        const emojis = ["😀","😂","😍","😭","👍","🙏","🎉","❤️","🤔","😎","👋","🔥"];
+        emojis.forEach(e => {
+            let span = document.createElement('div'); span.className = 'emoji-item'; span.innerText = e;
+            span.onclick = () => { ui.chatInput.value += e; ui.chatInput.focus(); };
+            ui.emojiPicker.appendChild(span);
         });
 
-        ui.dropZone.addEventListener('drop', handleDrop, false);
+        function toggleChat() {
+            const isHidden = ui.chatModal.style.display === 'none' || ui.chatModal.style.display === '';
+            ui.chatModal.style.display = isHidden ? 'flex' : 'none';
+            if (isHidden) { ui.fabBadge.style.display = 'none'; ui.chatInput.focus(); }
+        }
+        function toggleEmoji() {
+            ui.emojiPicker.style.display = ui.emojiPicker.style.display === 'grid' ? 'none' : 'grid';
+        }
 
-        async function handleDrop(e) {
-            let dt = e.dataTransfer;
-            // Modern Directory scanning
-            if (dt.items) {
-                let items = dt.items;
-                for (let i = 0; i < items.length; i++) {
-                    let item = items[i].webkitGetAsEntry ? items[i].webkitGetAsEntry() : items[i].getAsEntry ? items[i].getAsEntry() : null;
-                    if (item) {
-                        await traverseFileTree(item);
-                    } else if (items[i].kind === 'file') {
-                        let file = items[i].getAsFile();
-                        addFileToQueue(file);
-                    }
-                }
+        function sendTextMessage() {
+            const text = ui.chatInput.value.trim();
+            if (!text || !conn) return;
+            // Send Chat Data
+            conn.send({ type: 'chat-text', text: text });
+            appendMessage(text, 'self');
+            ui.chatInput.value = "";
+            ui.emojiPicker.style.display = 'none';
+        }
+
+        function appendMessage(content, sender, isImage = false) {
+            const div = document.createElement('div');
+            div.className = `message msg-${sender}`;
+            
+            if (isImage) {
+                // content is blob url
+                div.innerHTML = `<img src="${content}" class="msg-img" onclick="openLightbox('${content}')">`;
             } else {
-                // Fallback for simple file drop
-                handleFiles(dt.files);
+                div.innerText = content;
             }
-            updateSendUI();
+            
+            ui.chatMessages.appendChild(div);
+            ui.chatMessages.scrollTop = ui.chatMessages.scrollHeight;
         }
 
-        async function traverseFileTree(item, path = "") {
-            if (item.isFile) {
-                // Get file
-                return new Promise(resolve => {
-                    item.file(file => {
-                        addFileToQueue(file);
-                        resolve();
-                    });
-                });
-            } else if (item.isDirectory) {
-                // Get folder contents
-                let dirReader = item.createReader();
-                return new Promise(resolve => {
-                    dirReader.readEntries(async entries => {
-                        for (let entry of entries) {
-                            await traverseFileTree(entry, path + item.name + "/");
-                        }
-                        resolve();
-                    });
-                });
+        function openLightbox(src) {
+            ui.lightboxImg.src = src;
+            ui.lightbox.style.display = 'flex';
+        }
+
+        // Paste Image Support
+        ui.chatInput.addEventListener('paste', e => {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (let item of items) {
+                if (item.kind === 'file') {
+                    const blob = item.getAsFile();
+                    // Send as file immediately
+                    addFileToQueue(blob);
+                    updateSendUI();
+                    processQueue(); // Auto send
+                    // Show preview in chat
+                    const url = URL.createObjectURL(blob);
+                    appendMessage(url, 'self', true); // Preview self
+                }
             }
-        }
+        });
 
-        function addFileToQueue(file) {
-            sendQueue.push(file);
-        }
-
-        function handleFiles(files) {
-            for (let i = 0; i < files.length; i++) {
-                addFileToQueue(files[i]);
-            }
-        }
-
-        function updateSendUI() {
-            if (sendQueue.length > 0) {
-                renderQueueList();
-                ui.send.btn.style.display = 'block'; 
-                ui.send.btn.innerText = `Send ${sendQueue.length} Files`;
-            }
-        }
-
-        // --- Standard File Input ---
-        function handleFileSelect(input) {
-            if (input.files && input.files.length > 0) {
-                handleFiles(input.files);
+        // Drag & Drop in Chat
+        ['dragenter', 'dragover'].forEach(evt => ui.chatMessages.addEventListener(evt, e => { e.preventDefault(); ui.chatMessages.classList.add('drag-over'); }));
+        ['dragleave', 'drop'].forEach(evt => ui.chatMessages.addEventListener(evt, e => { e.preventDefault(); ui.chatMessages.classList.remove('drag-over'); }));
+        ui.chatMessages.addEventListener('drop', e => {
+            e.preventDefault();
+            if (e.dataTransfer.files.length > 0) {
+                handleFiles(e.dataTransfer.files);
                 updateSendUI();
+                processQueue(); // Auto send dropped files in chat
+                showToast("Sending files from chat...");
             }
-        }
+        });
 
-        function renderQueueList() {
-            ui.send.list.innerHTML = "";
-            sendQueue.forEach((file, index) => {
-                const li = document.createElement('li'); li.className = 'file-item'; li.id = `file-item-${index}`;
-                li.innerHTML = `<span class="file-icon">📄</span><span class="file-name">${file.name}</span><span class="file-status">Wait</span>`;
-                ui.send.list.appendChild(li);
-            });
-        }
-
-        // --- Common Logic ---
-        function startScan() {
-            ui.scan.overlay.style.display = "flex";
-            html5QrCode = new Html5Qrcode("reader");
-            html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: { width: 250, height: 250 } },
-                (decodedText) => { ui.input.value = decodedText; stopScan(); showToast("ID Scanned"); if(navigator.vibrate) navigator.vibrate(200); },
-                () => {}).catch(err => { showToast("Camera Error"); stopScan(); });
-        }
-        function stopScan() {
-            if(html5QrCode && html5QrCode.isScanning) html5QrCode.stop().then(() => { html5QrCode.clear(); ui.scan.overlay.style.display = "none"; }).catch(() => { ui.scan.overlay.style.display = "none"; });
-            else ui.scan.overlay.style.display = "none";
-        }
-
-        function connectToFriend() {
-            const friendId = ui.input.value.trim();
-            if(!friendId) return showToast("Please enter ID");
-            conn = peer.connect(friendId, { reliable: true });
-            showToast("Connecting...");
-            setupConnection();
-        }
-
+        // --- File Transfer Logic ---
         function setupConnection() {
             conn.on('open', () => { 
-                showToast("Connected!"); 
-                ui.statusText.innerText = "Linked";
-                ui.panels.connect.style.display = 'none'; 
-                ui.panels.transfer.style.display = 'block'; 
+                showToast("Connected!"); ui.statusText.innerText = "Linked";
+                ui.panels.connect.style.display = 'none'; ui.panels.transfer.style.display = 'block';
+                ui.fabChat.style.display = 'flex'; // Show Chat Button
             });
             conn.on('close', () => { showToast("Disconnected"); setTimeout(() => location.reload(), 2000); });
             conn.on('data', handleDataReceived);
@@ -424,6 +411,7 @@
 
         let incomingFile = { buffer: [], receivedSize: 0, meta: null };
         function handleDataReceived(data) {
+            // 1. Binary Data (File Chunk)
             if (data instanceof ArrayBuffer || data instanceof Uint8Array) {
                 if(!incomingFile.meta) return;
                 const chunk = new Uint8Array(data);
@@ -432,71 +420,82 @@
                 if (incomingFile.receivedSize % (CHUNK_SIZE * 20) === 0 || incomingFile.receivedSize === incomingFile.meta.fileSize) {
                     updateProgress(Math.floor((incomingFile.receivedSize / incomingFile.meta.fileSize) * 100));
                 }
-            } else if (data.type) {
+            } 
+            // 2. Control / Chat Data
+            else if (data.type) {
                 if (data.type === 'header') {
                     incomingFile.buffer = []; incomingFile.receivedSize = 0; incomingFile.meta = data;
                     ui.receive.section.style.display = 'block'; ui.progress.area.style.display = 'block';
-                    showToast(`Receiving: ${data.fileName}`);
-                    requestWakeLock();
-                } else if (data.type === 'end') {
+                    showToast(`Receiving: ${data.fileName}`); requestWakeLock();
+                } 
+                else if (data.type === 'end') {
                     updateProgress(100);
-                    createDownloadButton(incomingFile.buffer, incomingFile.meta);
+                    const blob = new Blob(incomingFile.buffer, { type: incomingFile.meta.fileType || 'application/octet-stream' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    // Add to list
+                    createDownloadButton(url, incomingFile.meta.fileName);
+                    
+                    // Add to chat (if image, show preview)
+                    if (incomingFile.meta.fileType.startsWith('image/')) {
+                         appendMessage(url, 'friend', true);
+                    } else {
+                         appendMessage(`📄 Received file: ${incomingFile.meta.fileName}`, 'friend');
+                    }
+                    
+                    // Badge notification
+                    if (ui.chatModal.style.display === 'none') ui.fabBadge.style.display = 'block';
+
                     showToast("Download Ready");
-                    incomingFile.buffer = []; incomingFile.meta = null;
-                    releaseWakeLock();
+                    incomingFile.buffer = []; incomingFile.meta = null; releaseWakeLock();
+                }
+                else if (data.type === 'chat-text') {
+                    appendMessage(data.text, 'friend');
+                    if (ui.chatModal.style.display === 'none') {
+                        ui.fabBadge.style.display = 'block';
+                        showToast("New Message 💬");
+                    }
                 }
             }
         }
 
-        function createDownloadButton(buffers, meta) {
-            const blob = new Blob(buffers, { type: meta.fileType || 'application/octet-stream' });
-            const url = URL.createObjectURL(blob);
-            const btn = document.createElement('a');
-            btn.href = url; btn.download = meta.fileName; btn.className = 'download-btn';
-            btn.innerHTML = `<span>📥 ${meta.fileName}</span>`;
-            ui.receive.list.prepend(btn);
-        }
+        // ... (Existing Drop/File Logic same as V1.4) ...
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => ui.dropZone.addEventListener(e, ev => {ev.preventDefault(); ev.stopPropagation();}));
+        ui.dropZone.addEventListener('drop', e => handleDrop(e));
 
-        async function processQueue() {
-            if (!conn || sendQueue.length === 0) return;
-            ui.send.btn.style.display = 'none'; ui.progress.area.style.display = 'block'; requestWakeLock();
-            for (let i = 0; i < sendQueue.length; i++) {
-                const file = sendQueue[i]; const li = document.getElementById(`file-item-${i}`);
-                showToast(`Sending ${i+1}/${sendQueue.length}`);
-                li.querySelector('.file-status').innerText = "Sending...";
-                await sendSingleFile(file);
-                li.classList.add('done'); li.querySelector('.file-status').innerText = "Done";
-                await new Promise(r => setTimeout(r, 1000));
+        async function handleDrop(e) {
+            let dt = e.dataTransfer;
+            if (dt.items) {
+                for (let i = 0; i < dt.items.length; i++) {
+                    let item = dt.items[i].webkitGetAsEntry ? dt.items[i].webkitGetAsEntry() : dt.items[i].getAsEntry ? dt.items[i].getAsEntry() : null;
+                    if (item) await traverseFileTree(item);
+                    else if (dt.items[i].kind === 'file') addFileToQueue(dt.items[i].getAsFile());
+                }
+            } else handleFiles(dt.files);
+            updateSendUI();
+        }
+        async function traverseFileTree(item) {
+            if (item.isFile) new Promise(r => item.file(f => { addFileToQueue(f); r(); }));
+            else if (item.isDirectory) {
+                let reader = item.createReader();
+                reader.readEntries(async entries => { for (let e of entries) await traverseFileTree(e); });
             }
-            showToast("All Sent!"); setTimeout(() => { ui.progress.area.style.display = 'none'; }, 1000); releaseWakeLock();
         }
+        function addFileToQueue(file) { sendQueue.push(file); }
+        function handleFiles(files) { for(let i=0; i<files.length; i++) addFileToQueue(files[i]); }
+        function updateSendUI() { if(sendQueue.length > 0) { renderQueueList(); ui.send.btn.style.display = 'block'; ui.send.btn.innerText = `Send ${sendQueue.length} Files`; }}
         
-        async function sendSingleFile(file) {
-            conn.send({ type: 'header', fileName: file.name, fileType: file.type, fileSize: file.size });
-            let offset = 0;
-            while (offset < file.size) {
-                if (conn.dataChannel.bufferedAmount > MAX_BUFFERED_AMOUNT) { await new Promise(r => setTimeout(r, 50)); continue; }
-                const chunk = file.slice(offset, offset + CHUNK_SIZE);
-                const buffer = await chunk.arrayBuffer();
-                conn.send(new Uint8Array(buffer));
-                offset += CHUNK_SIZE;
-                if (offset % (CHUNK_SIZE * 20) === 0) updateProgress(Math.floor((offset / file.size) * 100));
-                await new Promise(r => setTimeout(r, 2));
-            }
-            conn.send({ type: 'end' });
-        }
-        
-        function updateProgress(percent) { 
-            ui.progress.bar.style.width = percent + '%'; 
-            ui.progress.text.innerText = percent + '%'; 
-        }
-        
-        function showToast(text) { 
-            ui.toast.innerText = text; 
-            ui.toast.style.display = 'block'; 
-            ui.toast.style.animation = 'pop 0.3s ease';
-            setTimeout(() => { ui.toast.style.display = 'none'; }, 3000); 
-        }
+        // ... (Rest of logic: Scan, Connect, Queue Process same as V1.4) ...
+        function startScan() { ui.scan.overlay.style.display = "flex"; html5QrCode = new Html5Qrcode("reader"); html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: { width: 250, height: 250 } }, t => { ui.input.value = t; stopScan(); showToast("Scanned"); navigator.vibrate?.(200); }, () => {}).catch(() => { showToast("Camera Error"); stopScan(); }); }
+        function stopScan() { if(html5QrCode?.isScanning) html5QrCode.stop().then(() => { html5QrCode.clear(); ui.scan.overlay.style.display = "none"; }); else ui.scan.overlay.style.display = "none"; }
+        function connectToFriend() { const id = ui.input.value.trim(); if(!id) return showToast("Enter ID"); conn = peer.connect(id, { reliable: true }); showToast("Connecting..."); setupConnection(); }
+        function createDownloadButton(url, name) { const btn = document.createElement('a'); btn.href = url; btn.download = name; btn.className = 'download-btn'; btn.innerHTML = `<span>📥 ${name}</span>`; ui.receive.list.prepend(btn); }
+        function handleFileSelect(input) { if(input.files.length) { handleFiles(input.files); updateSendUI(); } }
+        function renderQueueList() { ui.send.list.innerHTML = ""; sendQueue.forEach((f, i) => { const li = document.createElement('li'); li.className = 'file-item'; li.id = `f-${i}`; li.innerHTML = `<span class="file-icon">📄</span><span class="file-name">${f.name}</span><span class="file-status">Wait</span>`; ui.send.list.appendChild(li); }); }
+        async function processQueue() { if(!conn || !sendQueue.length) return; ui.send.btn.style.display = 'none'; ui.progress.area.style.display = 'block'; requestWakeLock(); for(let i=0; i<sendQueue.length; i++) { const li = document.getElementById(`f-${i}`); showToast(`Sending ${i+1}/${sendQueue.length}`); if(li) li.querySelector('.file-status').innerText = "Sending..."; await sendSingleFile(sendQueue[i]); if(li) { li.classList.add('done'); li.querySelector('.file-status').innerText = "Done"; } await new Promise(r=>setTimeout(r,500)); } showToast("Sent!"); setTimeout(()=>ui.progress.area.style.display='none',1000); releaseWakeLock(); sendQueue=[]; }
+        async function sendSingleFile(file) { conn.send({type:'header',fileName:file.name,fileType:file.type,fileSize:file.size}); let offset=0; while(offset<file.size){ if(conn.dataChannel.bufferedAmount>MAX_BUFFERED_AMOUNT){ await new Promise(r=>setTimeout(r,50)); continue; } const chunk = file.slice(offset,offset+CHUNK_SIZE); const buffer = await chunk.arrayBuffer(); conn.send(new Uint8Array(buffer)); offset+=CHUNK_SIZE; if(offset%(CHUNK_SIZE*20)===0) updateProgress(Math.floor((offset/file.size)*100)); await new Promise(r=>setTimeout(r,2)); } conn.send({type:'end'}); }
+        function updateProgress(p) { ui.progress.bar.style.width = p+'%'; ui.progress.text.innerText = p+'%'; }
+        function showToast(t) { ui.toast.innerText = t; ui.toast.style.display = 'block'; ui.toast.style.animation = 'pop 0.3s ease'; setTimeout(()=>ui.toast.style.display='none',3000); }
     </script>
 </body>
 </html>
