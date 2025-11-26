@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#90BE6D">
+    <meta name="theme-color" content="#88B066">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>MochiDrop 🦥</title>
     
@@ -17,100 +17,246 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@500;700&display=swap');
         
+        /* --- 定义全新的精致绿色系变量 --- */
+        :root {
+            --bg-color: #F2F7F2;         /* 更清新的浅绿灰背景 */
+            --text-dark: #3E4E38;        /* 深森林绿文本，比纯黑柔和 */
+            --text-light: #7A8F76;       /* 浅灰绿辅助文本 */
+            --primary-green: #88B066;    /* 主树懒绿，更沉稳 */
+            --primary-light: #AED9B2;    /* 浅亮绿，用于高光和背景 */
+            --primary-dark: #6A8F4D;     /* 深绿，用于按钮按下和边框 */
+            --accent-yellow: #F9C74F;    /* 点缀黄 */
+            --success-bg: #E6F4EA;       /* 成功背景 */
+            --success-text: #2E7D48;     /* 成功文本 */
+            
+            /* 高级感阴影系统 */
+            --shadow-card: 
+                0 10px 30px -5px rgba(136, 176, 102, 0.2),
+                0 5px 15px -5px rgba(136, 176, 102, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.8); /* 微妙内边框增加层次 */
+            --shadow-btn: 0 6px 15px -4px rgba(136, 176, 102, 0.5);
+            --shadow-btn-active: inset 0 3px 5px rgba(0, 0, 0, 0.1);
+            --shadow-input-inner: inset 0 2px 4px rgba(136, 176, 102, 0.15);
+        }
+
         body { 
             font-family: 'Quicksand', sans-serif; 
-            background-color: #F0F2F5; /* 树懒喜欢的灰色背景 */
-            color: #4A4A4A; 
+            background-color: var(--bg-color);
+            /* 添加微妙的背景纹理 */
+            background-image: radial-gradient(circle at 10% 20%, rgba(136, 176, 102, 0.05) 0%, transparent 20%),
+                              radial-gradient(circle at 90% 80%, rgba(174, 217, 178, 0.05) 0%, transparent 20%);
+            color: var(--text-dark);
             margin: 0; display: flex; flex-direction: column; align-items: center; 
             min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent; 
+            padding-bottom: 30px;
         }
 
-        /* 标题风格：树懒绿 */
         h1 { 
             font-family: 'Fredoka One', cursive; 
-            color: #90BE6D; 
-            font-size: 2.2rem; 
-            margin-top: 25px; 
-            text-shadow: 2px 2px 0px #FFF; 
-            display: flex; align-items: center; gap: 10px;
+            color: var(--primary-green); 
+            font-size: 2.4rem; 
+            margin-top: 30px; 
+            margin-bottom: 25px;
+            /* 更柔和的文字描边效果 */
+            text-shadow: 3px 3px 0px #FFF, 4px 4px 10px rgba(136, 176, 102, 0.2);
+            display: flex; align-items: center; gap: 12px;
+            letter-spacing: 1px;
         }
+        
+        /* 树懒图标增加一点动感 */
+        h1 img { filter: drop-shadow(0 4px 4px rgba(136, 176, 102, 0.3)); }
 
         .container { 
-            width: 85%; max-width: 380px; 
-            background: white; 
-            border-radius: 25px; 
-            padding: 20px; 
-            box-shadow: 0 8px 20px rgba(144, 190, 109, 0.2); /* 绿色阴影 */
-            text-align: center; margin-bottom: 20px; 
-            border: 2px solid #FFF; position: relative;
+            width: 86%; max-width: 400px; 
+            background: #FFFFFF;
+            /* 超大圆角，更Q弹 */
+            border-radius: 35px; 
+            padding: 25px; 
+            box-shadow: var(--shadow-card);
+            text-align: center; margin-bottom: 25px; 
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            /* 玻璃拟态微效果 */
+            backdrop-filter: blur(10px);
         }
+        /* 轻微的悬浮交互 */
+        .container:hover { transform: translateY(-3px); box-shadow: 0 15px 35px -5px rgba(136, 176, 102, 0.3); }
 
         .card-header { 
-            font-weight: 700; font-size: 1.1rem; margin-bottom: 15px; 
-            color: #90BE6D; text-transform: uppercase; letter-spacing: 1px;
+            font-weight: 700; font-size: 1.1rem; margin-bottom: 18px; 
+            color: var(--primary-green); text-transform: uppercase; letter-spacing: 1.5px;
+            /* 增加一个小装饰线 */
+            position: relative;
+            display: inline-block;
+        }
+        .card-header::after {
+            content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
+            width: 30px; height: 3px; background: var(--primary-light); border-radius: 3px;
         }
 
-        .input-group { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; }
+        .input-group { display: flex; justify-content: center; gap: 12px; margin-bottom: 15px; width: 100%;}
         
         input[type="text"] { 
-            width: 60%; padding: 12px; border-radius: 50px; 
-            border: 2px solid #C1E1C1; outline: none; text-align: center; 
-            font-size: 1.0rem; color: #556B2F; font-weight: bold; 
+            flex: 1; padding: 14px; border-radius: 50px; 
+            border: 2px solid transparent; /* 用背景模拟边框以实现渐变 */
+            background: linear-gradient(#FFF, #FFF) padding-box, 
+                        linear-gradient(45deg, var(--primary-light), var(--primary-green)) border-box;
+            box-shadow: var(--shadow-input-inner);
+            outline: none; text-align: center; 
+            font-size: 1.05rem; color: var(--primary-green); font-weight: 700; 
+            transition: all 0.3s ease;
+            font-family: 'Quicksand', sans-serif;
+        }
+        input[type="text"]::placeholder { color: var(--text-light); font-weight: 500; }
+        input[type="text"]:focus { 
+            box-shadow: var(--shadow-input-inner), 0 0 0 4px rgba(136, 176, 102, 0.2);
+            background: linear-gradient(#F9FDF9, #F9FDF9) padding-box, 
+                        linear-gradient(45deg, var(--primary-green), var(--primary-light)) border-box;
         }
         
-        /* 按钮：树懒绿 */
+        /* 精致的果冻按钮 */
         .btn { 
-            background-color: #90BE6D; color: white; border: none; padding: 12px 0; 
-            border-radius: 50px; font-size: 1rem; font-weight: bold; cursor: pointer; 
-            box-shadow: 0 4px 0 #769F54; transition: all 0.1s; width: 80%; margin: 5px auto;
+            /* 渐变背景增加立体感 */
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white; border: none; padding: 14px 0; 
+            border-radius: 50px; font-size: 1.05rem; font-weight: 800; cursor: pointer; 
+            box-shadow: var(--shadow-btn); 
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 弹性过渡 */
+            width: 90%; margin: 8px auto;
+            letter-spacing: 0.5px;
+            position: relative; overflow: hidden;
         }
-        .btn:active { transform: translateY(4px); box-shadow: 0 0 0 #769F54; }
+        /* 按钮高光 */
+        .btn::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent);
+            border-radius: 50px 50px 0 0; pointer-events: none;
+        }
+        .btn:active { 
+            transform: scale(0.98) translateY(2px); 
+            box-shadow: var(--shadow-btn-active);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-green));
+        }
         
-        .btn-icon { width: 50px; padding: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .btn-icon { 
+            width: 54px; height: 54px; padding: 0; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 1.4rem; flex-shrink: 0; margin: 0;
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+        }
 
-        /* 状态条 */
-        #status { margin-top: 10px; padding: 10px 20px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; display: none; max-width: 80%; z-index: 100;}
-        .status-success { background: #E0F8E0; color: #2E8B57; border: 2px solid #90EE90; }
-        .status-wait { background: #FFF8DC; color: #DAA520; border: 2px solid #F0E68C; }
-        .status-error { background: #FFE4E1; color: #D14785; border: 2px solid #FF69B4; }
+        /* 状态条优化 */
+        #status { 
+            margin-top: 15px; padding: 12px 25px; border-radius: 30px; 
+            font-weight: 700; font-size: 0.95rem; display: none; max-width: 85%; z-index: 100;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            backdrop-filter: blur(5px);
+        }
+        .status-success { background: var(--success-bg); color: var(--success-text); border: 2px solid #C3E6CB; }
+        .status-wait { background: #FFFBE6; color: #B78A00; border: 2px solid #FFE58F; }
+        .status-error { background: #FFEBEE; color: #C62828; border: 2px solid #FFCDD2; }
 
-        /* 进度条 */
-        .progress-wrapper { width: 90%; margin: 10px auto; display: none; }
-        .progress-bg { width: 100%; height: 12px; background: #eee; border-radius: 10px; overflow: hidden; }
-        .progress-fill { height: 100%; width: 0%; background: #90BE6D; transition: width 0.2s; }
-        .progress-text { font-size: 0.8rem; color: #888; margin-top: 5px; }
+        /* 进度条优化 */
+        .progress-wrapper { width: 92%; margin: 15px auto; display: none; }
+        .progress-bg { 
+            width: 100%; height: 16px; background: #E9F0E9; 
+            border-radius: 20px; overflow: hidden; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); /* 凹槽感 */
+            border: 1px solid #DEEADE;
+        }
+        .progress-fill { 
+            height: 100%; width: 0%; 
+            background: linear-gradient(90deg, var(--primary-light), var(--primary-green));
+            border-radius: 20px;
+            transition: width 0.3s ease-out; 
+            box-shadow: 2px 0 5px rgba(136, 176, 102, 0.3);
+        }
+        .progress-text { font-size: 0.85rem; color: var(--text-light); margin-top: 8px; font-weight: 600;}
 
-        /* 文件列表 */
-        .file-list { list-style: none; padding: 0; margin: 10px 0; max-height: 200px; overflow-y: auto; text-align: left;}
-        .file-item { background: #F9FDF9; margin-bottom: 8px; padding: 10px; border-radius: 15px; font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; border: 1px solid #C1E1C1;}
-        .file-item.done { background: #E0F8E0; border-color: #90EE90; color: #2E8B57;}
+        /* 文件列表项优化 */
+        .file-list { list-style: none; padding: 0; margin: 15px 0; max-height: 220px; overflow-y: auto; text-align: left;}
+        .file-item { 
+            background: #FFFFFF; margin-bottom: 10px; padding: 12px 15px; 
+            border-radius: 18px; font-size: 0.95rem; font-weight: 600;
+            display: flex; align-items: center; justify-content: space-between; 
+            border: 2px solid var(--primary-light);
+            color: var(--text-dark);
+            box-shadow: 0 4px 10px rgba(136, 176, 102, 0.05);
+            transition: all 0.2s;
+        }
+        .file-item.done { 
+            background: var(--success-bg); 
+            border-color: #C3E6CB; 
+            color: var(--success-text);
+            box-shadow: none;
+        }
 
         .download-btn { 
-            display: block; background-color: #F9C74F; color: #555; padding: 10px; 
-            border-radius: 15px; text-decoration: none; margin-bottom: 10px; 
-            box-shadow: 0 3px 0 #D4A328; font-weight: bold; font-size: 0.9rem; animation: pop 0.5s ease; 
+            display: block; background: linear-gradient(135deg, var(--accent-yellow), #F5B000); 
+            color: #FFF; padding: 14px; border-radius: 20px; text-decoration: none; 
+            margin-bottom: 12px; box-shadow: 0 6px 15px -4px rgba(249, 199, 79, 0.5);
+            font-weight: 800; font-size: 0.95rem; 
+            animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            border: none; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
-        /* 扫码层 */
-        #scan-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 999; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        #reader { width: 80vw; max-width: 400px; aspect-ratio: 1/1; border-radius: 20px; overflow: hidden; background: #000; border: 4px solid #90BE6D; box-shadow: 0 0 30px rgba(144, 190, 109, 0.6); }
-        .btn-stop { background-color: #FF6347; box-shadow: 0 4px 0 #CD5C5C; margin-top: 30px; width: auto; padding: 12px 30px; color: white; border:none; border-radius: 50px; font-weight:bold; cursor:pointer;}
+        /* 扫码层优化 */
+        #scan-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(62, 78, 56, 0.9); /* 深绿色半透明 */
+            z-index: 999; display: none; flex-direction: column; align-items: center; justify-content: center; 
+            backdrop-filter: blur(15px); /* 更强的毛玻璃 */
+        }
+        #reader { 
+            width: 80vw; max-width: 380px; aspect-ratio: 1/1; border-radius: 30px; 
+            overflow: hidden; background: #000; 
+            border: 5px solid var(--primary-green); 
+            box-shadow: 0 0 40px rgba(136, 176, 102, 0.8); 
+        }
+        .btn-stop { 
+            background: linear-gradient(135deg, #FF6347, #D32F2F);
+            box-shadow: 0 6px 15px -4px rgba(255, 99, 71, 0.5);
+            margin-top: 35px; width: auto; padding: 12px 35px; color: white; border:none; border-radius: 50px; font-weight:800; cursor:pointer;
+        }
         
-        .file-label { display: flex; flex-direction: column; align-items: center; justify-content: center; background: #E9F5DB; padding: 15px; border-radius: 20px; cursor: pointer; width: 80%; border: 3px dashed #90BE6D; color: #556B2F; font-weight: bold; margin: 0 auto; }
+        .file-label { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            background: #F4F9F1; padding: 25px; border-radius: 25px; cursor: pointer; width: 82%; 
+            border: 3px dashed var(--primary-light); color: var(--primary-green); 
+            font-weight: 700; margin: 0 auto; 
+            transition: all 0.3s ease;
+        }
+        .file-label:hover { background: #E9F5DB; border-color: var(--primary-green); transform: scale(1.02);}
         
-        /* 二维码区域增强 */
-        #qrcode { margin: 10px auto; padding: 10px; background: white; border-radius: 15px; display: inline-block; min-height: 130px; min-width: 130px; }
+        #qrcode { 
+            margin: 15px auto; padding: 15px; background: white; border-radius: 25px; 
+            display: inline-block; min-height: 130px; min-width: 130px; 
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05); border: 2px solid var(--primary-light);
+        }
         
-        .id-box { background: #F0F8FF; color: #4682B4; padding: 5px 15px; border-radius: 15px; font-family: monospace; font-size: 1.1rem; letter-spacing: 1px; margin-top: 5px; display: inline-block; border: 2px dashed #87CEEB; }
-        .lan-tip { font-size: 0.8rem; color: #888; margin-top: 5px; background: #f9f9f9; padding: 5px 10px; border-radius: 10px; display: inline-block;}
+        .id-box { 
+            background: #EAF4FF; color: #2B6CB0; padding: 8px 20px; border-radius: 20px; 
+            font-family: 'Quicksand Mono', monospace; font-size: 1.15rem; font-weight: 700;
+            letter-spacing: 1.5px; margin-top: 10px; display: inline-block; 
+            border: 3px dashed #BEE3F8; 
+        }
+        .lan-tip { 
+            font-size: 0.85rem; color: var(--text-light); margin-top: 15px; 
+            background: #E9F0E9; padding: 8px 15px; border-radius: 50px; display: inline-block;
+            font-weight: 600;
+        }
         
-        /* 树懒装饰 */
-        .sloth-icon { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #90BE6D; margin-bottom: 10px;}
+        .sloth-icon { 
+            width: 70px; height: 70px; border-radius: 50%; 
+            border: 4px solid var(--primary-green); margin-bottom: 15px;
+            box-shadow: 0 8px 20px rgba(136, 176, 102, 0.3);
+            background: white; padding: 5px;
+        }
     </style>
 </head>
 <body>
 
-    <h1><img src="https://cdn-icons-png.flaticon.com/512/3750/3750019.png" style="width:40px;height:40px;"> SlothDrop 🦥</h1>
+    <h1><img src="https://cdn-icons-png.flaticon.com/512/3750/3750019.png" style="width:45px;height:45px;"> SlothDrop 🦥</h1>
 
     <div class="container">
         <div class="card-header">我是谁 (My ID)</div>
@@ -119,7 +265,8 @@
         <div id="qrcode"></div>
         <br>
         <div id="my-id" class="id-box">连接服务器中...</div>
-        <div class="lan-tip">💡 提示：RW2/JPG 防撕裂 & 4KB 安全切片</div>
+        <div class="lan-tip">✨ 4KB安全切片 & 局域网极速 ✨</div>
+        <div style="margin-top: 10px; font-size: 0.75rem; color: var(--primary-green); font-weight: 700; opacity: 0.6;">by 美男子</div>
     </div>
 
     <div class="container" id="connect-panel">
@@ -135,14 +282,17 @@
         <div class="card-header">传输队列</div>
         
         <div id="send-section">
-            <label for="file-input" class="file-label">📂 选择相片 (RW2/JPG)</label>
+            <label for="file-input" class="file-label">
+                <span style="font-size: 2rem; margin-bottom: 10px;">📂</span>
+                点击选择文件
+            </label>
             <input type="file" id="file-input" style="display:none" multiple onchange="handleFileSelect(this)">
             <ul id="queue-list" class="file-list"></ul>
             <button class="btn" onclick="processQueue()" id="send-btn" style="display:none;">🚀 开始批量发送</button>
         </div>
 
-        <div id="receive-section" style="margin-top:20px; display:none; border-top:2px dashed #eee; padding-top:10px;">
-             <div style="color:#90BE6D; font-weight:bold; margin-bottom:10px;">🎁 接收到的文件列表</div>
+        <div id="receive-section" style="margin-top:25px; display:none; border-top: 3px dashed var(--primary-light); padding-top:20px;">
+             <div style="color:var(--primary-green); font-weight:800; margin-bottom:15px; font-size: 1.05rem;">🎁 接收到的文件列表</div>
              <div id="received-list"></div>
         </div>
 
@@ -153,12 +303,15 @@
     </div>
 
     <div id="status"></div>
-    <div id="scan-overlay"><div style="color:white; margin-bottom:20px; font-weight:bold;">请对准朋友的二维码</div><div id="reader"></div><button class="btn-stop" onclick="stopScan()">❌ 关闭摄像头</button></div>
+    <div id="scan-overlay">
+        <div style="color:white; margin-bottom:25px; font-weight:800; font-size: 1.2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">请对准朋友的二维码</div>
+        <div id="reader"></div>
+        <button class="btn-stop" onclick="stopScan()">❌ 关闭摄像头</button>
+    </div>
 
     <script>
-        // --- v8.0 核心逻辑 (4KB 安全切片) ---
         let peer = null; let conn = null; let html5QrCode = null; 
-        const CHUNK_SIZE = 4 * 1024; // 4KB
+        const CHUNK_SIZE = 4 * 1024; 
         const MAX_BUFFERED_AMOUNT = 32 * 1024; 
         let sendQueue = []; let wakeLock = null;
 
@@ -172,50 +325,22 @@
             progress: { area: document.getElementById('progress-area'), bar: document.getElementById('progress-bar'), text: document.getElementById('progress-text') }
         };
 
-        // --- 初始化 (增加错误处理) ---
         try {
             peer = new Peer(null, { debug: 1 });
-            
             peer.on('open', id => {
-                console.log("My Peer ID:", id);
                 ui.myId.innerText = id;
-                
-                // 修复二维码：清空 -> 延时生成
-                const qrContainer = document.getElementById("qrcode");
-                qrContainer.innerHTML = "";
-                
+                const qrContainer = document.getElementById("qrcode"); qrContainer.innerHTML = "";
                 setTimeout(() => {
-                    try {
-                        new QRCode(qrContainer, { 
-                            text: id, 
-                            width: 128, 
-                            height: 128, 
-                            colorDark : "#556B2F", // 树懒深绿
-                            colorLight : "#ffffff", 
-                            correctLevel : QRCode.CorrectLevel.L 
-                        });
-                    } catch(e) {
-                        console.error("QRCode Error:", e);
-                        qrContainer.innerText = "二维码生成失败";
-                    }
+                    try { new QRCode(qrContainer, { text: id, width: 128, height: 128, colorDark : "#3E4E38", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.L }); } catch(e) { qrContainer.innerText = "二维码生成失败"; }
                 }, 100);
             });
-
-            peer.on('error', err => {
-                console.error(err);
-                showStatus("⚠️ 网络错误: " + err.type, "error");
-                ui.myId.innerText = "连接失败";
-            });
-
+            peer.on('error', err => { showStatus("⚠️ 网络错误: " + err.type, "error"); ui.myId.innerText = "连接失败"; });
             peer.on('connection', c => { conn = c; setupConnection("🎉 朋友已连接!"); });
-        } catch(e) {
-            alert("PeerJS 初始化失败，请检查网络");
-        }
+        } catch(e) { alert("PeerJS 初始化失败"); }
 
         async function requestWakeLock() { try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} }
         function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
-        // --- 扫码 ---
         function startScan() {
             ui.scan.overlay.style.display = "flex";
             html5QrCode = new Html5Qrcode("reader");
@@ -242,7 +367,6 @@
             conn.on('data', handleDataReceived);
         }
 
-        // --- 接收端 ---
         let incomingFile = { buffer: [], receivedSize: 0, meta: null };
         function handleDataReceived(data) {
             if (data instanceof ArrayBuffer || data instanceof Uint8Array) {
@@ -250,20 +374,17 @@
                 const chunk = new Uint8Array(data);
                 incomingFile.buffer.push(chunk);
                 incomingFile.receivedSize += chunk.byteLength;
-                
                 if (incomingFile.receivedSize % (CHUNK_SIZE * 20) === 0 || incomingFile.receivedSize === incomingFile.meta.fileSize) {
                     const percent = Math.floor((incomingFile.receivedSize / incomingFile.meta.fileSize) * 100);
                     updateProgress(percent, "接收中");
                 }
-            } 
-            else if (data.type) {
+            } else if (data.type) {
                 if (data.type === 'header') {
                     incomingFile.buffer = []; incomingFile.receivedSize = 0; incomingFile.meta = data;
                     ui.receive.section.style.display = 'block'; ui.progress.area.style.display = 'block';
                     showStatus(`📦 接收中: ${data.fileName}`, "wait");
                     requestWakeLock();
-                } 
-                else if (data.type === 'end') {
+                } else if (data.type === 'end') {
                     updateProgress(100, "完成");
                     createDownloadButton(incomingFile.buffer, incomingFile.meta);
                     showStatus(`✅ ${incomingFile.meta.fileName} 接收完毕`, "success");
@@ -278,15 +399,12 @@
             const url = URL.createObjectURL(blob);
             const btn = document.createElement('a');
             btn.href = url; btn.download = meta.fileName; btn.className = 'download-btn';
-            
             let tip = "";
-            if (meta.fileName.toLowerCase().endsWith('.rw2')) tip = "<br><span style='font-size:0.7em; color:#d9534f'>(📸 RAW格式)</span>";
-            
-            btn.innerHTML = `📥 保存: ${meta.fileName} <span style="font-size:0.8em">(${(meta.fileSize/1024/1024).toFixed(2)}MB)</span>${tip}`;
+            if (meta.fileName.toLowerCase().endsWith('.rw2')) tip = "<br><span style='font-size:0.7em; opacity:0.8'>(📸 RAW格式)</span>";
+            btn.innerHTML = `📥 保存: ${meta.fileName} <span style="font-size:0.8em; opacity:0.8">(${(meta.fileSize/1024/1024).toFixed(2)}MB)</span>${tip}`;
             ui.receive.list.prepend(btn);
         }
 
-        // --- 发送端 (4KB 切片) ---
         function handleFileSelect(input) {
             if (input.files && input.files.length > 0) {
                 sendQueue = Array.from(input.files); renderQueueList();
@@ -297,7 +415,7 @@
             ui.send.list.innerHTML = "";
             sendQueue.forEach((file, index) => {
                 const li = document.createElement('li'); li.className = 'file-item'; li.id = `file-item-${index}`;
-                li.innerHTML = `<span style="font-size:1.2rem;margin-right:10px;">📄</span> <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${file.name}</span>`;
+                li.innerHTML = `<span style="font-size:1.3rem;margin-right:12px;">📄</span> <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${file.name}</span>`;
                 ui.send.list.appendChild(li);
             });
         }
@@ -308,7 +426,7 @@
                 const file = sendQueue[i]; const li = document.getElementById(`file-item-${i}`);
                 showStatus(`📤 (${i+1}/${sendQueue.length}) 发送中: ${file.name}`, "wait");
                 await sendSingleFile(file);
-                li.classList.add('done'); li.innerHTML += ' ✅';
+                li.classList.add('done'); li.innerHTML = '✅ ' + li.innerHTML;
                 await new Promise(r => setTimeout(r, 1000));
             }
             showStatus("✅ 所有文件发送完毕！", "success"); ui.progress.area.style.display = 'none'; releaseWakeLock();
@@ -318,15 +436,11 @@
             conn.send({ type: 'header', fileName: file.name, fileType: file.type, fileSize: file.size });
             let offset = 0;
             while (offset < file.size) {
-                if (conn.dataChannel.bufferedAmount > MAX_BUFFERED_AMOUNT) {
-                    await new Promise(r => setTimeout(r, 50));
-                    continue;
-                }
+                if (conn.dataChannel.bufferedAmount > MAX_BUFFERED_AMOUNT) { await new Promise(r => setTimeout(r, 50)); continue; }
                 const chunk = file.slice(offset, offset + CHUNK_SIZE);
                 const buffer = await chunk.arrayBuffer();
                 conn.send(new Uint8Array(buffer));
                 offset += CHUNK_SIZE;
-                
                 if (offset % (CHUNK_SIZE * 20) === 0) updateProgress(Math.floor((offset / file.size) * 100), "发送中");
                 await new Promise(r => setTimeout(r, 2));
             }
