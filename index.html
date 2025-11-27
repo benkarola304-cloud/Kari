@@ -145,4 +145,256 @@
 
         .lightbox { position: fixed; inset: 0; background: black; z-index: 3000; display: none; align-items: center; justify-content: center; }
         .lightbox.active { display: flex; animation: fadeIn 0.2s; }
-        .lightbox-content { max-width: 1
+        .lightbox-content { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .btn-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.3); width: 36px; height: 36px; border-radius: 50%; border:none; color:white; font-size:24px; z-index: 3001; }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+    </style>
+</head>
+<body>
+
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <button class="btn-close">×</button>
+        <img id="lb-img" class="lightbox-content" style="display:none" onclick="event.stopPropagation()">
+        <video id="lb-video" class="lightbox-content" controls style="display:none" onclick="event.stopPropagation()"></video>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="card">
+            <div class="logo-wrapper-lg">
+                <img src="./sloth.png" class="hero-img" alt="Logo" onerror="this.style.display='none';this.parentNode.style.background='#ccc'">
+            </div>
+            
+            <h2 style="margin:0; font-size:20px; color:var(--text-main)">闪电快传</h2>
+            
+            <div id="qr-code" style="margin:20px auto; padding:8px; background:white; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.05); display:inline-block; min-height: 100px;"></div>
+            
+            <div class="id-display" id="my-id">正在生成...</div>
+            
+            <input type="text" id="target-id" class="input-id" placeholder="输入对方 ID" autocomplete="off">
+            <div id="scanner-box"><div id="reader" style="width:100%;height:100%"></div></div>
+
+            <div style="display:flex; gap:10px;">
+                <button class="btn-block btn-ghost" onclick="toggleScan()" style="flex:1">📷</button>
+                <button class="btn-block" onclick="connect()" style="flex:2">连接</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="navbar">
+        <div class="brand">
+            <div class="logo-small-crop">
+                <img src="./sloth.png" class="app-logo">
+            </div>
+            <span class="app-name">闪电快传</span>
+        </div>
+        <div class="status-pill" id="status"><div class="dot"></div><span>离线</span></div>
+    </div>
+
+    <div class="main-container">
+        <div class="drag-overlay" id="drag-overlay">
+            <svg class="icon-lg" style="width:60px;height:60px;margin-bottom:10px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            <div style="font-size:18px">松手 发送文件</div>
+        </div>
+        <div class="drop-zone-wrapper">
+            <div class="drop-card" id="drop-zone">
+                <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                <span class="drop-label">点击或拖拽 发送文件</span>
+            </div>
+        </div>
+        <div class="chat-scroll" id="chat-list">
+            <div class="sys-notice">V10.0 稳定版</div>
+        </div>
+    </div>
+
+    <div class="input-area-wrapper">
+        <div class="input-bar">
+            <button class="btn-circle" onclick="toggleInputMode()">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h2v2H6zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h2v2H6zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h12v2H6z"/></svg>
+            </button>
+            <button id="btn-voice" class="btn-voice-long">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                <span>按住 说话</span>
+            </button>
+            <input id="msg-input" type="text" placeholder="输入消息..." autocomplete="off">
+            <button class="btn-circle primary" id="btn-send" style="display:none;" onclick="sendText()">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+            <button class="btn-circle" id="btn-plus" onclick="document.getElementById('file-input').click()">
+                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+        </div>
+    </div>
+    <input type="file" id="file-input" multiple style="display:none">
+
+    <script>
+        // --- 全局变量 ---
+        const App = { id: null, peer: null, conn: null, connected: false, queue: [], isSending: false, wakeLock: null };
+        
+        // --- 1. 安全启动 ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // 延时一点启动，确保 DOM 和外部库加载完毕
+            setTimeout(init, 100);
+        });
+
+        async function reqWake() { if ('wakeLock' in navigator) try { App.wakeLock = await navigator.wakeLock.request('screen'); } catch(e){} }
+        document.addEventListener('visibilitychange', async () => { if (App.wakeLock && document.visibilityState==='visible') reqWake(); });
+
+        function init() {
+            try {
+                // ID 生成
+                App.id = localStorage.getItem('sloth_v10') || (Math.floor(Math.random()*9000)+1000).toString();
+                localStorage.setItem('sloth_v10', App.id);
+                
+                const idEl = document.getElementById('my-id');
+                if(idEl) idEl.innerText = App.id;
+
+                // 二维码生成 (安全检查)
+                const qrEl = document.getElementById("qr-code");
+                if (qrEl && window.QRCode) {
+                    qrEl.innerHTML = ''; // 清空旧的
+                    new QRCode(qrEl, { text: App.id, width: 100, height: 100, colorDark: "#2D7CA8", colorLight: "#FFFFFF" });
+                } else {
+                    console.error("QRCode library missing or element missing");
+                }
+
+                // PeerJS 启动
+                if (window.Peer) {
+                    App.peer = new Peer(App.id, { debug: 1 });
+                    App.peer.on('open', () => { 
+                        const statusEl = document.querySelector('#status span');
+                        if(statusEl) statusEl.innerText='等待连接'; 
+                        reqWake(); 
+                    });
+                    App.peer.on('connection', conn => { if(confirm('连接 ID: '+conn.peer+'?')) setupConn(conn); });
+                    App.peer.on('error', err => alert('网络错误: '+err.type));
+                } else {
+                    alert("核心库加载失败，请检查网络");
+                }
+            } catch (e) {
+                console.error("Init Error:", e);
+                alert("启动失败，请刷新重试");
+            }
+        }
+
+        // --- 连接逻辑 ---
+        function connect() { const tid = document.getElementById('target-id').value.trim(); if(tid) setupConn(App.peer.connect(tid, { reliable: true })); }
+        function setupConn(conn) {
+            if(App.conn) App.conn.close(); App.conn = conn;
+            conn.on('open', () => conn.send({ type: 'handshake' }));
+            conn.on('data', handleData);
+            conn.on('close', () => location.reload());
+        }
+        function setConnected() {
+            App.connected = true; document.getElementById('modal').style.display = 'none';
+            const s = document.getElementById('status'); s.classList.add('online'); s.querySelector('span').innerText='已连接';
+            reqWake();
+        }
+
+        // --- 数据处理 ---
+        let Rx = { buf: [], size: 0, meta: null };
+        function handleData(data) {
+            if (data.type) {
+                if(data.type === 'handshake') { if(!App.connected) App.conn.send({type:'handshake'}); setConnected(); }
+                else if(data.type === 'text') addMsg(data.text, 'peer');
+                else if(data.type === 'file-start') { Rx = { buf: [], size: 0, meta: data }; createFileItem(data.id, data.name, data.size, 'peer', data.mime); }
+                else if(data.type === 'file-end') finishFile(data.id, Rx.meta.mime);
+            } else { Rx.buf.push(data); Rx.size += data.byteLength; updateProgress(Rx.meta.id, Rx.size, Rx.meta.size); }
+        }
+
+        // --- 拖拽与发送 ---
+        const dropZone = document.getElementById('drop-zone');
+        dropZone.onclick=()=>document.getElementById('file-input').click();
+        
+        // 全局拖拽修复
+        let dragCounter = 0;
+        const dragOverlay = document.getElementById('drag-overlay');
+        window.addEventListener('dragenter', e => { e.preventDefault(); dragCounter++; dragOverlay.classList.add('active'); });
+        window.addEventListener('dragleave', e => { e.preventDefault(); dragCounter--; if(dragCounter === 0) dragOverlay.classList.remove('active'); });
+        window.addEventListener('dragover', e => e.preventDefault());
+        window.addEventListener('drop', async e => {
+            e.preventDefault(); dragCounter = 0; dragOverlay.classList.remove('active');
+            const items = [...e.dataTransfer.items], list = [];
+            for (let i of items) {
+                const ent = i.webkitGetAsEntry ? i.webkitGetAsEntry() : null;
+                if (ent) list = list.concat(await scanEntry(ent));
+                else if (i.kind === 'file') list.push(i.getAsFile());
+            }
+            if(list.length) enqueue(list);
+        });
+
+        async function scanEntry(e){
+            if(e.isFile) return new Promise(r=>e.file(f=>r([f])));
+            if(e.isDirectory){ const r=e.createReader(); const ents=await new Promise(res=>r.readEntries(res)); let arr=[]; for(let sub of ents) arr=arr.concat(await scanEntry(sub)); return arr; } return [];
+        }
+        document.getElementById('file-input').onchange=e=>enqueue(e.target.files);
+
+        function enqueue(files) {
+            if(!App.connected) return alert('请连接');
+            Array.from(files).forEach(f => { const id = 'f-'+Date.now()+Math.random().toString(16).substr(2,4); createFileItem(id, f.name, f.size, 'self', f.type); App.queue.push({ f, id }); });
+            processQueue();
+        }
+        function processQueue() { if(App.isSending || !App.queue.length) return; App.isSending = true; sendFile(App.queue.shift()); }
+        function sendFile({ f, id }) {
+            App.conn.send({ type:'file-start', id, name:f.name, size:f.size, mime:f.type });
+            const r = new FileReader(); let off=0;
+            const push=()=>{ if(App.conn.dataChannel.bufferedAmount>65536){setTimeout(push,20);return;} const s = f.slice(off, off+32768); r.readAsArrayBuffer(s); };
+            r.onload=e=>{
+                App.conn.send(e.target.result); off+=e.target.result.byteLength; updateProgress(id, off, f.size);
+                if(off<f.size) setTimeout(push,0); else { App.conn.send({type:'file-end', id}); App.isSending=false; setTimeout(processQueue,100); }
+            };
+            push();
+        }
+
+        // --- 媒体功能 ---
+        let mRec, chunks=[]; const bVoice=document.getElementById('btn-voice');
+        const startR=async e=>{
+            e.preventDefault(); if(!App.connected) return alert('请连接');
+            try { const s=await navigator.mediaDevices.getUserMedia({audio:true}); mRec=new MediaRecorder(s); chunks=[]; mRec.ondataavailable=e=>chunks.push(e.data); mRec.onstop=()=>{ enqueue([new File([new Blob(chunks,{type:'audio/webm'})],"voice.webm",{type:'audio/webm'})]) }; mRec.start(); bVoice.classList.add('recording'); bVoice.querySelector('span').innerText="松开 发送"; } catch(err){alert("麦克风不可用");}
+        };
+        const stopR=e=>{ e.preventDefault(); if(mRec&&mRec.state!=='inactive'){mRec.stop(); bVoice.classList.remove('recording'); bVoice.querySelector('span').innerText="按住 说话";} };
+        ['touchstart','mousedown'].forEach(k=>bVoice.addEventListener(k,startR));
+        ['touchend','mouseup'].forEach(k=>bVoice.addEventListener(k,stopR));
+
+        function openLightbox(url, type) {
+            const lb = document.getElementById('lightbox'), img = document.getElementById('lb-img'), vid = document.getElementById('lb-video');
+            img.style.display = 'none'; vid.style.display = 'none'; lb.classList.add('active');
+            if (type === 'img') { img.src = url; img.style.display = 'block'; } else { vid.src = url; vid.style.display = 'block'; vid.play(); }
+        }
+        window.closeLightbox = () => { document.getElementById('lightbox').classList.remove('active'); document.getElementById('lb-video').pause(); };
+
+        function createFileItem(id, name, size, who, mime) {
+            const div = document.createElement('div'); div.className = `msg-row ${who}`; div.id = `msg-${id}`;
+            let iconSvg;
+            if (mime.includes('image')) iconSvg = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+            else if (mime.includes('video')) iconSvg = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>';
+            else iconSvg = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>';
+            div.innerHTML = `<div class="file-card"><div class="file-inner"><div class="file-icon-box">${iconSvg}</div><div class="file-info"><div class="file-name">${name}</div><div class="file-meta">${(size/1024).toFixed(1)} KB</div><div class="progress-bar"><div class="progress-fill"></div></div></div><div class="action-overlay"><button class="btn-action">查看</button></div></div></div>`;
+            document.getElementById('chat-list').appendChild(div); document.getElementById('chat-list').scrollTop = 99999;
+        }
+
+        function updateProgress(id, cur, tot) { const el = document.getElementById(`msg-${id}`); if(el) el.querySelector('.progress-fill').style.width = (cur/tot*100)+'%'; }
+        function finishFile(id, mime) {
+            const el = document.getElementById(`msg-${id}`); if(!el) return;
+            el.querySelector('.progress-bar').style.display = 'none';
+            const url = URL.createObjectURL(new Blob(Rx.buf, {type: mime})); Rx.buf = [];
+            const inner = el.querySelector('.file-inner'), overlay = el.querySelector('.action-overlay'), btn = el.querySelector('.btn-action');
+            btn.style.display = 'flex';
+            if (mime.includes('image')) { btn.innerText = "预览"; inner.onclick = () => openLightbox(url, 'img'); } 
+            else if (mime.includes('video')) { btn.innerText = "播放"; inner.onclick = () => openLightbox(url, 'video'); } 
+            else if (mime.includes('audio')) { btn.innerText = "听语音"; inner.onclick = () => new Audio(url).play(); } 
+            else { btn.innerText = "下载"; inner.onclick = () => { const a=document.createElement('a'); a.href=url; a.download='file'; a.click(); }; }
+        }
+
+        function toggleInputMode() {
+            const t=document.getElementById('msg-input'), v=document.getElementById('btn-voice'), s=document.getElementById('btn-send'), p=document.getElementById('btn-plus');
+            if(t.style.display==='none'){ t.style.display='block'; v.style.display='none'; s.style.display='block'; p.style.display='none'; t.focus(); } else{ t.style.display='none'; v.style.display='flex'; s.style.display='none'; p.style.display='flex'; }
+        }
+        function sendText(){ const v=document.getElementById('msg-input').value; if(v){ App.conn.send({type:'text',text:v}); addMsg(v,'self'); document.getElementById('msg-input').value=''; } }
+        function addMsg(t,w){ const d=document.createElement('div'); d.className=`msg-row ${w}`; d.innerHTML=`<div class="bubble">${t}</div>`; document.getElementById('chat-list').append(d); document.getElementById('chat-list').scrollTop=99999; }
+        
+        let qr; window.toggleScan=()=>{ const s=document.getElementById('scanner-box'); if(s.style.display==='block'){s.style.display='none';if(qr)qr.stop();}else{s.style.display='block';qr=new Html5Qrcode("reader");qr.start({facingMode:"environment"},{fps:10},t=>{document.getElementById('target-id').value=t;toggleScan();});}};
+
+    </script>
+</body>
+</html>
