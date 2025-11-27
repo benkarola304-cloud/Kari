@@ -1,10 +1,12 @@
-const CACHE_NAME = 'sloth-v5-final';
+const CACHE_NAME = 'sloth-premium-v6'; // 升级版本号
 const FILES = [
-    './', './index.html', './manifest.json',
+    './', 
+    './index.html', 
+    './manifest.json',
+    './Gemini_Generated_Image_lnxa7ilnxa7ilnxa.jpg', // 缓存图片
     'https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
-    'https://unpkg.com/html5-qrcode',
-    'https://cdn-icons-png.flaticon.com/512/2353/2353678.png'
+    'https://unpkg.com/html5-qrcode'
 ];
 
 self.addEventListener('install', e => {
