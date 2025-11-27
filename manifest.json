@@ -1,9 +1,9 @@
 {
-  "name": "SlothDrop IM",
-  "short_name": "SlothDrop",
+  "name": "闪电快传",
+  "short_name": "闪电快传",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#F0F2F5",
+  "background_color": "#F5F7FA",
   "theme_color": "#4A90E2",
   "orientation": "portrait",
   "icons": [
