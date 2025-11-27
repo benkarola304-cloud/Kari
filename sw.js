@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sloth-v14-robust';
+const CACHE_NAME = 'sloth-v15-native';
 const FILES = [
     './', './index.html', './manifest.json', './sloth.png',
     'https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js',
