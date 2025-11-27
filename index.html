@@ -40,15 +40,14 @@
         /* 主界面 */
         .main-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; padding-bottom: 70px; }
         
-        /* 核心修复：拖拽全屏遮罩 (添加 pointer-events: none) */
+        /* 全屏拖拽遮罩 (pointer-events: none 是关键，防止阻挡 Drop 事件) */
         .drag-overlay {
-            position: absolute; inset: 0; background: rgba(255,255,255,0.9); z-index: 999; 
+            position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 999; 
             display: none; flex-direction: column; align-items: center; justify-content: center;
             color: var(--primary); font-weight: bold; backdrop-filter: blur(5px);
-            pointer-events: none; /* <--- 关键修复：让鼠标事件穿透遮罩层 */
+            pointer-events: none; /* 核心修复：让鼠标穿透遮罩，直接触发 window 的 drop */
         }
-        .drag-overlay.active { display: flex; }
-
+        
         .drop-zone-wrapper { padding: 16px 20px 0 20px; flex-shrink: 0; transition: 0.2s; }
         .drop-card {
             height: 100px; background: var(--surface); border-radius: var(--radius-L); 
@@ -111,7 +110,7 @@
         .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 5000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
         .lightbox.active { display: flex; opacity: 1; }
         .lightbox-content { max-width: 95%; max-height: 90vh; object-fit: contain; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        .pdf-frame { width: 95%; height: 85vh; border: none; background: white; border-radius: 8px; }
+        .pdf-frame { width: 100%; height: 90vh; border: none; background: white; }
         .btn-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 50%; border:none; color:white; font-size:24px; z-index: 5001; cursor: pointer; }
 
         /* Toast */
@@ -129,7 +128,7 @@
         <button class="btn-close" onclick="triggerClose()">×</button>
         <img id="lb-img" class="lightbox-content" style="display:none" onclick="event.stopPropagation()">
         <video id="lb-video" class="lightbox-content" controls style="display:none" onclick="event.stopPropagation()"></video>
-        <iframe id="lb-pdf" class="pdf-frame" style="display:none" onclick="event.stopPropagation()"></iframe>
+        <object id="lb-pdf" class="pdf-frame" type="application/pdf" style="display:none" onclick="event.stopPropagation()"></object>
     </div>
 
     <div class="modal" id="modal">
@@ -156,7 +155,7 @@
     </div>
 
     <div class="main-container">
-        <div class="drag-overlay" id="drag-overlay" style="display:none;position:absolute;inset:0;background:rgba(255,255,255,0.9);z-index:99;flex-direction:column;align-items:center;justify-content:center;color:var(--primary);font-weight:bold;pointer-events:none;">
+        <div class="drag-overlay" id="drag-overlay">
             <div style="font-size:60px">📂</div>
             <div>松手 发送文件</div>
         </div>
@@ -164,11 +163,11 @@
         <div class="drop-zone-wrapper">
             <div class="drop-card" id="drop-zone">
                 <svg class="icon-lg" style="width:32px;height:32px;margin-bottom:5px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                <span class="drop-label">点击或拖拽 发送文件</span>
+                <span class="drop-label">点击或拖拽文件 (支持文件夹)</span>
             </div>
         </div>
         <div class="chat-scroll" id="chat-list">
-            <div class="sys-notice">V17.0 拖拽修正版</div>
+            <div class="sys-notice">V19.0 拖拽内核修复版</div>
         </div>
     </div>
 
@@ -193,8 +192,8 @@
         }
 
         function init() {
-            App.id = localStorage.getItem('sloth_v17') || (Math.floor(Math.random()*9000)+1000).toString();
-            localStorage.setItem('sloth_v17', App.id);
+            App.id = localStorage.getItem('sloth_v19') || (Math.floor(Math.random()*9000)+1000).toString();
+            localStorage.setItem('sloth_v19', App.id);
             document.getElementById('my-id').innerText = App.id;
             const qr = document.getElementById("qr-code");
             if(qr && window.QRCode) new QRCode(qr, { text: App.id, width: 100, height: 100, colorDark: "#2D7CA8", colorLight: "#FFFFFF" });
@@ -235,18 +234,41 @@
         }
         function calcSpeed(bytes, ms) { return ms<=0?'':(bytes/ms*1000 > 1048576 ? (bytes/ms*1000/1048576).toFixed(1)+' MB/s' : (bytes/ms*1000/1024).toFixed(0)+' KB/s'); }
 
-        // --- 拖拽逻辑修复 (pointer-events: none) ---
+        // --- 拖拽逻辑 (V14 稳定版回归) ---
         const dragOverlay = document.getElementById('drag-overlay');
+        const dropCard = document.getElementById('drop-zone');
         let dragCounter = 0;
-        document.addEventListener('dragenter', e => { e.preventDefault(); dragCounter++; dragOverlay.style.display='flex'; });
-        document.addEventListener('dragleave', e => { e.preventDefault(); dragCounter--; if(dragCounter===0) dragOverlay.style.display='none'; });
-        document.addEventListener('dragover', e => e.preventDefault());
-        document.addEventListener('drop', async e => {
-            e.preventDefault(); dragCounter=0; dragOverlay.style.display='none';
-            const items = [...e.dataTransfer.items], list = [];
-            for(let i of items){ const ent=i.webkitGetAsEntry?i.webkitGetAsEntry():null; if(ent) list=list.concat(await scanEntry(ent)); else if(i.kind==='file') list.push(i.getAsFile()); }
+
+        // 监听 document.body 确保全屏有效
+        document.body.addEventListener('dragenter', e => { e.preventDefault(); dragCounter++; dragOverlay.style.display='flex'; });
+        document.body.addEventListener('dragleave', e => { e.preventDefault(); dragCounter--; if(dragCounter===0) dragOverlay.style.display='none'; });
+        document.body.addEventListener('dragover', e => e.preventDefault());
+        
+        document.body.addEventListener('drop', async e => {
+            e.preventDefault(); 
+            dragCounter=0; 
+            dragOverlay.style.display='none';
+            
+            const items = [...e.dataTransfer.items];
+            let list = [];
+            
+            // 优先尝试获取文件流
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                 for(let i=0; i<e.dataTransfer.files.length; i++) list.push(e.dataTransfer.files[i]);
+            } 
+            // 否则尝试解析 Entry (文件夹)
+            else {
+                for(let i of items){ 
+                    const ent = i.webkitGetAsEntry ? i.webkitGetAsEntry() : null;
+                    if(ent) list = list.concat(await scanEntry(ent));
+                    else if(i.kind==='file') list.push(i.getAsFile()); 
+                }
+            }
+            
             if(list.length) enqueue(list);
+            else showToast("未识别到文件", "error");
         });
+
         document.getElementById('drop-zone').onclick = () => document.getElementById('file-input').click();
         document.getElementById('file-input').onchange = e => enqueue(e.target.files);
         async function scanEntry(e){ if(e.isFile)return new Promise(r=>e.file(f=>r([f]))); if(e.isDirectory){const r=e.createReader();const ents=await new Promise(res=>r.readEntries(res));let a=[];for(let s of ents)a=a.concat(await scanEntry(s));return a;} return []; }
@@ -299,9 +321,14 @@
         function finishFile(id, mime) {
             const el = document.getElementById(`msg-${id}`); if(!el) return;
             el.querySelector('.progress-bar').style.display='none'; el.querySelector('.speed-tag').innerText='完成';
-            const url = URL.createObjectURL(new Blob(Rx.buf, {type: mime})); Rx.buf = [];
+            const url = URL.createObjectURL(new Blob(Rx.buf, {type: mime})); 
+            const filename = Rx.meta ? Rx.meta.name : 'file';
+            Rx.buf = [];
             const inner = el.querySelector('.file-inner'), thumbBox = el.querySelector('.thumb-box'), btnPreview = el.querySelector('.btn-preview');
-            inner.onclick = () => { const a=document.createElement('a'); a.href=url; a.download='file'; a.click(); };
+            
+            // 点击主体下载 (使用原始文件名)
+            inner.onclick = () => { const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); };
+
             if (mime.includes('image')) {
                 thumbBox.innerHTML = `<img src="${url}" class="thumb-img">`; btnPreview.style.display = 'flex';
                 btnPreview.onclick = (e) => { e.stopPropagation(); openLightbox(url, 'img'); };
@@ -324,11 +351,11 @@
             lb.classList.add('active');
             if(type==='img') { img.src=url; img.style.display='block'; }
             else if(type==='video') { vid.src=url; vid.style.display='block'; vid.play(); }
-            else if(type==='pdf') { pdf.src=url; pdf.style.display='block'; }
+            else if(type==='pdf') { pdf.data=url; pdf.style.display='block'; }
         }
         window.addEventListener('popstate', () => {
             const lb = document.getElementById('lightbox'); lb.classList.remove('active');
-            document.getElementById('lb-video').pause(); document.getElementById('lb-pdf').src = '';
+            document.getElementById('lb-video').pause(); document.getElementById('lb-pdf').data = '';
         });
         window.triggerClose = () => history.back();
 
@@ -336,7 +363,15 @@
         const startR=async e=>{e.preventDefault();if(!App.connected)return;try{const s=await navigator.mediaDevices.getUserMedia({audio:true});mRec=new MediaRecorder(s);chunks=[];mRec.ondataavailable=e=>chunks.push(e.data);mRec.onstop=()=>enqueue([new File([new Blob(chunks)],"voice.webm",{type:'audio/webm'})]);mRec.start();bVoice.classList.add('recording');bVoice.innerText="松开 发送";}catch(e){showToast("麦克风错误", 'error');}};
         const stopR=e=>{e.preventDefault();if(mRec)mRec.stop();bVoice.classList.remove('recording');bVoice.innerText="按住 说话";}
         ['touchstart','mousedown'].forEach(k=>bVoice.addEventListener(k,startR)); ['touchend','mouseup'].forEach(k=>bVoice.addEventListener(k,stopR));
-        window.toggleInput=()=>{const t=document.getElementById('msg-input'), v=document.getElementById('btn-voice'), s=document.getElementById('btn-send'); if(t.style.display==='none'){t.style.display='block';v.style.display='none';s.style.display='block';t.focus();}else{t.style.display='none';v.style.display='block';s.style.display='none';}};
+        
+        window.toggleInput=()=>{
+            const t=document.getElementById('msg-input'), v=document.getElementById('btn-voice'), s=document.getElementById('btn-send');
+            if(t.style.display==='none'){
+                t.style.display='block'; v.style.display='none'; s.style.display='block'; t.focus();
+            } else {
+                t.style.display='none'; v.style.display='block'; s.style.display='none';
+            }
+        };
         window.sendText=()=>{const v=document.getElementById('msg-input').value;if(v){App.conn.send({type:'text',text:v});addMsg(v,'self');document.getElementById('msg-input').value='';}};
         function addMsg(t,w){const d=document.createElement('div');d.className=`msg-row ${w}`;d.innerHTML=`<div class="bubble">${t}</div>`;document.getElementById('chat-list').append(d);document.getElementById('chat-list').scrollTop=99999;}
         let qr; window.toggleScan=()=>{const s=document.getElementById('scanner-box');if(s.style.display==='block'){s.style.display='none';if(qr)qr.stop();}else{s.style.display='block';qr=new Html5Qrcode("reader");qr.start({facingMode:"environment"},{fps:10},t=>{document.getElementById('target-id').value=t;toggleScan();});}};
