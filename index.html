@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#FFF8E7">
+    <meta name="theme-color" content="#F9F4EF">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>闪电快传</title>
     
     <link rel="manifest" href="manifest.json">
@@ -15,109 +16,245 @@
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     
     <style>
+        /* --- 1. 精品级设计系统 (Premium Design System) --- */
         :root {
-            --primary: #2D7CA8; --bg: #FFF8E7; --surface: #FFFFFF;
-            --text-main: #3E3228; --text-sub: #8D8176;
-            --radius-L: 24px; --radius-M: 16px;
+            /* 调色板：更高级的暖调白与深邃蓝 */
+            --bg-color: #F9F4EF; /* 暖纸色 */
+            --surface-glass: rgba(255, 255, 255, 0.75);
+            --surface-solid: #FFFFFF;
+            
+            --primary: #2B6CB0; /* 专业深蓝 */
+            --primary-soft: #EBF8FF;
+            --text-main: #2D3748;
+            --text-sub: #718096;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.01);
+            
+            --radius-L: 20px;
+            --radius-M: 14px;
+            
             --safe-bottom: env(safe-area-inset-bottom);
         }
+
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); }
-        .icon { width: 24px; height: 24px; fill: currentColor; }
         
-        /* 导航栏 */
+        body { 
+            margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif; 
+            background: var(--bg-color); height: 100dvh; 
+            display: flex; flex-direction: column; overflow: hidden; 
+            color: var(--text-main); -webkit-font-smoothing: antialiased;
+        }
+
+        .icon { width: 22px; height: 22px; fill: currentColor; stroke-width: 2; }
+
+        /* --- 2. 导航栏 (毛玻璃) --- */
         .navbar {
-            height: 60px; padding: 0 16px; background: rgba(255, 248, 231, 0.95);
-            display: flex; justify-content: space-between; align-items: center; z-index: 50; flex-shrink: 0; border-bottom: 1px solid rgba(0,0,0,0.05);
+            height: 56px; padding: 0 20px; 
+            background: rgba(249, 244, 239, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            display: flex; justify-content: space-between; align-items: center; 
+            z-index: 50; flex-shrink: 0; border-bottom: 1px solid rgba(0,0,0,0.03);
         }
-        .brand { display: flex; align-items: center; gap: 10px; }
-        .logo-box { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        
+        /* 极致裁切：消除白边 */
+        .logo-box { 
+            width: 32px; height: 32px; border-radius: 50%; 
+            background: transparent; overflow: hidden; 
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--shadow-sm);
+        }
         .app-logo { width: 100%; height: 100%; object-fit: cover; }
-        .app-name { font-size: 17px; font-weight: 800; }
-        .status-pill { font-size: 11px; padding: 5px 12px; border-radius: 20px; background: rgba(0,0,0,0.05); color: var(--text-sub); font-weight: 600; }
-        .status-pill.online { background: #D1F2EB; color: #0E6251; }
+        
+        .app-name { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; color: var(--text-main); }
+        
+        .status-pill { 
+            font-size: 11px; padding: 4px 10px; border-radius: 12px; 
+            background: rgba(0,0,0,0.04); color: var(--text-sub); font-weight: 600; 
+            transition: 0.3s;
+        }
+        .status-pill.online { background: #C6F6D5; color: #22543D; }
 
-        /* 主界面 */
+        /* --- 3. 主布局 --- */
         .main-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; padding-bottom: 70px; }
-        
-        /* 全屏拖拽遮罩 (pointer-events: none 是关键，防止阻挡 Drop 事件) */
+
+        /* 全屏拖拽遮罩 (极简风) */
         .drag-overlay {
-            position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 999; 
+            position: fixed; inset: 0; background: rgba(255,255,255,0.85); z-index: 999; 
             display: none; flex-direction: column; align-items: center; justify-content: center;
-            color: var(--primary); font-weight: bold; backdrop-filter: blur(5px);
-            pointer-events: none; /* 核心修复：让鼠标穿透遮罩，直接触发 window 的 drop */
+            color: var(--primary); backdrop-filter: blur(8px);
+            pointer-events: none; /* 关键：穿透事件 */
         }
-        
-        .drop-zone-wrapper { padding: 16px 20px 0 20px; flex-shrink: 0; transition: 0.2s; }
+        .drag-overlay.active { display: flex; animation: fadeIn 0.2s; }
+
+        /* 投递区 (Paper Card 风格) */
+        .drop-zone-wrapper { padding: 16px 20px 0 20px; flex-shrink: 0; }
         .drop-card {
-            height: 100px; background: var(--surface); border-radius: var(--radius-L); 
-            border: 2px dashed #E0D6CC; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; cursor: pointer; color: var(--primary); 
-            box-shadow: 0 4px 12px rgba(62, 50, 40, 0.04); transition: all 0.2s ease;
+            height: 90px; background: var(--surface-solid); border-radius: var(--radius-L); 
+            border: 1px solid rgba(0,0,0,0.06);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            cursor: pointer; color: var(--primary); 
+            box-shadow: var(--shadow-sm); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .drop-card.drag-active { border: 2px solid var(--primary); background: #EBF5FF; transform: scale(1.02); }
-        .drop-label { font-size: 14px; font-weight: 600; color: var(--text-sub); margin-top: 8px; }
+        .drop-card:active { transform: scale(0.98); background: var(--primary-soft); }
+        .drop-card.drag-active { 
+            border: 2px solid var(--primary); background: var(--primary-soft); 
+            box-shadow: var(--shadow-md); transform: scale(1.02);
+        }
+        .drop-label { font-size: 13px; font-weight: 600; color: var(--text-sub); margin-top: 6px; }
 
-        .chat-scroll { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        .sys-notice { text-align: center; font-size: 12px; color: var(--text-sub); opacity: 0.6; margin: 10px 0; }
+        /* 聊天区 */
+        .chat-scroll { flex: 1; padding: 16px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
+        .sys-notice { 
+            text-align: center; font-size: 12px; color: var(--text-sub); opacity: 0.6; 
+            margin: 10px 0; font-weight: 500;
+        }
 
-        /* 消息气泡 */
-        .msg-row { display: flex; width: 100%; margin-bottom: 4px; }
-        .msg-row.self { justify-content: flex-end; } .msg-row.peer { justify-content: flex-start; }
-        .bubble { max-width: 85%; padding: 10px 14px; border-radius: var(--radius-M); font-size: 15px; background: var(--surface); box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-        .msg-row.self .bubble { background: var(--primary); color: white; border-bottom-right-radius: 4px; }
-        .msg-row.peer .bubble { border-bottom-left-radius: 4px; }
-
-        /* 文件卡片 */
-        .file-card { width: 240px; position: relative; }
-        .file-inner { background: var(--surface); border-radius: 12px; padding: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .msg-row.self .file-inner { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); }
+        /* 消息气泡 (Modern) */
+        .msg-row { display: flex; width: 100%; margin-bottom: 2px; }
+        .msg-row.self { justify-content: flex-end; } 
+        .msg-row.peer { justify-content: flex-start; }
         
-        .thumb-box { width: 48px; height: 48px; border-radius: 8px; background: #F3F4F6; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+        .bubble { 
+            max-width: 85%; padding: 10px 14px; border-radius: var(--radius-M); 
+            font-size: 15px; line-height: 1.5; 
+            box-shadow: var(--shadow-sm);
+        }
+        .msg-row.self .bubble { background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+        .msg-row.peer .bubble { background: var(--surface-solid); color: var(--text-main); border-bottom-left-radius: 4px; }
+
+        /* 文件卡片 (精细化) */
+        .file-card { width: 240px; position: relative; }
+        .file-inner { 
+            background: var(--surface-solid); border-radius: 12px; padding: 10px; 
+            display: flex; align-items: center; gap: 12px; cursor: pointer; 
+            transition: background 0.2s;
+        }
+        .msg-row.self .file-inner { 
+            background: rgba(255,255,255,0.1); /* 深色背景下的半透明 */
+            border: 1px solid rgba(255,255,255,0.15); 
+        }
+        
+        .thumb-box { 
+            width: 44px; height: 44px; border-radius: 10px; background: #EDF2F7; 
+            display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; 
+        }
         .thumb-img { width: 100%; height: 100%; object-fit: cover; }
         .msg-row.self .thumb-box { background: rgba(255,255,255,0.2); color: white; }
 
         .file-info { flex: 1; overflow: hidden; }
-        .file-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .file-meta { font-size: 11px; opacity: 0.8; margin-top: 2px; display: flex; justify-content: space-between; }
-        .msg-row.self .file-name, .msg-row.self .file-meta { color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .file-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .file-meta { font-size: 11px; opacity: 0.7; margin-top: 3px; display: flex; justify-content: space-between; font-weight: 500; }
+        .msg-row.self .file-name, .msg-row.self .file-meta { color: white; }
         
-        .progress-bar { height: 3px; background: rgba(0,0,0,0.05); margin-top: 6px; border-radius: 2px; overflow: hidden; }
+        .progress-bar { height: 3px; background: rgba(0,0,0,0.06); margin-top: 8px; border-radius: 2px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; background: var(--primary); transition: width 0.2s; }
         .msg-row.self .progress-fill { background: white; }
 
-        .btn-preview { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; border: none; position: absolute; right: -10px; bottom: -10px; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: pointer; z-index: 10; }
+        /* 预览按钮 */
+        .btn-preview { 
+            width: 34px; height: 34px; border-radius: 50%; background: var(--surface-solid); color: var(--primary); 
+            border: none; position: absolute; right: -10px; bottom: -10px; 
+            display: none; align-items: center; justify-content: center; 
+            box-shadow: var(--shadow-md); cursor: pointer; z-index: 10;
+            transition: transform 0.2s;
+        }
+        .btn-preview:active { transform: scale(0.9); }
 
-        /* 底部栏 */
-        .input-area-wrapper { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.98); padding: 8px 12px; padding-bottom: max(8px, var(--safe-bottom)); z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.02); }
-        .input-bar { display: flex; align-items: center; gap: 8px; height: 44px; }
-        .btn-circle { width: 40px; height: 40px; border-radius: 50%; border: none; background: #F2F0EB; color: var(--text-sub); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
-        .btn-voice { flex: 1; height: 40px; border-radius: 20px; background: #F2F0EB; border: none; font-weight: bold; color: var(--text-main); }
-        .btn-voice.recording { background: #FF8F66; color: white; }
-        #msg-input { flex: 1; height: 40px; border-radius: 20px; background: #F2F0EB; border: none; padding: 0 16px; display: none; }
-
-        /* 弹窗 & 加载动画 */
-        .modal { position: fixed; inset: 0; background: #FFF8E7; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .card { width: 85%; max-width: 340px; background: white; padding: 30px 20px; border-radius: 28px; text-align: center; box-shadow: 0 12px 30px rgba(62,50,40,0.08); }
-        .hero-crop { width: 110px; height: 110px; margin: 0 auto 16px auto; border-radius: 50%; background: transparent; box-shadow: 0 8px 25px rgba(0,0,0,0.1); overflow: hidden; animation: breathe 3s ease-in-out infinite; }
-        .hero-img { width: 100%; height: 100%; object-fit: cover; }
-        @keyframes breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
-        .id-display { background: #F5F7FA; padding: 10px; border-radius: 10px; margin: 15px 0; font-family: monospace; font-weight: bold; font-size: 18px; }
-        .input-id { width: 100%; height: 46px; border-radius: 14px; border: 2px solid #EEE; text-align: center; font-size: 16px; margin-bottom: 15px; outline: none;}
-        .btn-block { width: 100%; height: 48px; border-radius: 14px; background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; }
+        /* 底部输入栏 (Glass) */
+        .input-area-wrapper { 
+            position: fixed; bottom: 0; left: 0; right: 0; 
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 10px 16px; padding-bottom: max(10px, var(--safe-bottom)); 
+            z-index: 100; box-shadow: 0 -1px 0 rgba(0,0,0,0.05); 
+        }
+        .input-bar { display: flex; align-items: center; gap: 10px; height: 44px; }
         
+        .btn-circle { 
+            width: 40px; height: 40px; border-radius: 50%; border: none; 
+            background: transparent; color: var(--text-sub); 
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; flex-shrink: 0; transition: 0.2s;
+        }
+        .btn-circle:active { background: rgba(0,0,0,0.05); }
+        .btn-circle svg { width: 26px; height: 26px; } /* 加大一点图标 */
+
+        .btn-voice { 
+            flex: 1; height: 42px; border-radius: 21px; border: none; 
+            background: #EDF2F7; color: var(--text-main); font-weight: 600; font-size: 15px;
+            transition: 0.2s;
+        }
+        .btn-voice:active { background: #E2E8F0; }
+        .btn-voice.recording { background: #FC8181; color: white; animation: pulse 1.5s infinite; }
+        
+        #msg-input { 
+            flex: 1; height: 42px; padding: 0 18px; border-radius: 21px; 
+            background: #EDF2F7; border: 1px solid transparent; outline: none; 
+            font-size: 16px; display: none; min-width: 0; color: var(--text-main);
+        }
+        #msg-input:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.1); }
+
+        /* 连接弹窗 (Premium) */
+        .modal { 
+            position: fixed; inset: 0; background: rgba(249, 244, 239, 0.95); z-index: 200; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            backdrop-filter: blur(5px);
+        }
+        .card { 
+            width: 86%; max-width: 360px; background: var(--surface-solid); padding: 36px 28px; 
+            border-radius: 32px; text-align: center; 
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .hero-crop {
+            width: 100px; height: 100px; margin: 0 auto 20px auto;
+            border-radius: 50%; background: transparent; 
+            box-shadow: var(--shadow-md); overflow: hidden; 
+            animation: float 4s ease-in-out infinite;
+        }
+        .hero-img { width: 100%; height: 100%; object-fit: cover; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+        .id-display { 
+            background: #EDF2F7; padding: 12px; border-radius: 12px; margin: 16px 0; 
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; 
+            font-weight: 700; font-size: 18px; letter-spacing: 1px; color: var(--primary);
+        }
+        .input-id { 
+            width: 100%; height: 48px; border-radius: 16px; border: 2px solid #EDF2F7; 
+            text-align: center; font-size: 16px; font-weight: 600; margin-bottom: 20px; outline: none;
+            transition: 0.2s; background: #F7FAFC;
+        }
+        .input-id:focus { border-color: var(--primary); background: white; }
+        
+        .btn-block { 
+            width: 100%; height: 50px; border-radius: 16px; background: var(--primary); 
+            color: white; border: none; font-weight: 700; font-size: 16px; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(43, 108, 176, 0.2); transition: 0.2s;
+        }
+        .btn-block:active { transform: scale(0.98); }
+        .btn-ghost { background: #EDF2F7; color: var(--text-main); box-shadow: none; }
+
         /* 灯箱 */
-        .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 5000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s ease-out; }
         .lightbox.active { display: flex; opacity: 1; }
-        .lightbox-content { max-width: 95%; max-height: 90vh; object-fit: contain; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        .pdf-frame { width: 100%; height: 90vh; border: none; background: white; }
-        .btn-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 50%; border:none; color:white; font-size:24px; z-index: 5001; cursor: pointer; }
+        .lightbox-content { max-width: 95%; max-height: 90vh; object-fit: contain; box-shadow: 0 0 30px rgba(0,0,0,0.5); border-radius: 4px; }
+        .pdf-frame { width: 95%; height: 85vh; border: none; background: white; border-radius: 8px; }
+        .btn-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.25); width: 44px; height: 44px; border-radius: 50%; border:none; color:white; font-size:24px; z-index: 5001; cursor: pointer; backdrop-filter: blur(10px); }
 
         /* Toast */
-        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; z-index: 6000; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
-        #toast.show { opacity: 1; }
-        #toast.error { background: #E74C3C; }
+        #toast { 
+            position: fixed; top: 12px; left: 50%; transform: translateX(-50%) translateY(-20px); 
+            background: rgba(45, 55, 72, 0.95); color: white; padding: 10px 24px; 
+            border-radius: 30px; font-size: 14px; font-weight: 500; z-index: 6000; 
+            opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); backdrop-filter: blur(4px);
+        }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        #toast.error { background: #E53E3E; }
 
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
     </style>
 </head>
 <body>
@@ -134,13 +271,13 @@
     <div class="modal" id="modal">
         <div class="card">
             <div class="hero-crop"><img src="./sloth.png" class="hero-img" alt="Logo"></div>
-            <h2 style="margin:0; font-size:20px;">闪电快传</h2>
-            <div id="qr-code" style="margin:20px auto; padding:8px; background:white; border-radius:12px; display:inline-block; min-height:100px;"></div>
+            <h2 style="margin:0; font-size:22px; color:var(--text-main)">闪电快传</h2>
+            <div id="qr-code" style="margin:24px auto; padding:10px; background:white; border-radius:16px; display:inline-block; min-height:100px;"></div>
             <div class="id-display" id="my-id">...</div>
-            <input type="text" id="target-id" class="input-id" placeholder="输入对方 ID">
-            <div id="scanner-box" style="display:none; height:240px; background:black; border-radius:16px; margin-bottom:15px;"><div id="reader" style="width:100%;height:100%"></div></div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn-block" onclick="toggleScan()" style="flex:1; background:#F2F0EB; color:#333">📷</button>
+            <input type="text" id="target-id" class="input-id" placeholder="输入对方 ID" autocomplete="off">
+            <div id="scanner-box" style="display:none; height:240px; background:black; border-radius:16px; margin-bottom:20px; overflow:hidden;"><div id="reader" style="width:100%;height:100%"></div></div>
+            <div style="display:flex; gap:12px;">
+                <button class="btn-block btn-ghost" onclick="toggleScan()" style="flex:1">📷</button>
                 <button class="btn-block" onclick="connect()" style="flex:2">连接</button>
             </div>
         </div>
@@ -156,27 +293,31 @@
 
     <div class="main-container">
         <div class="drag-overlay" id="drag-overlay">
-            <div style="font-size:60px">📂</div>
-            <div>松手 发送文件</div>
+            <div style="font-size:60px; margin-bottom:20px;">📂</div>
+            <div style="font-size:18px;">松手 发送文件</div>
         </div>
 
         <div class="drop-zone-wrapper">
             <div class="drop-card" id="drop-zone">
-                <svg class="icon-lg" style="width:32px;height:32px;margin-bottom:5px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                <svg class="icon" style="width:36px;height:36px;margin-bottom:8px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
                 <span class="drop-label">点击或拖拽文件 (支持文件夹)</span>
             </div>
         </div>
         <div class="chat-scroll" id="chat-list">
-            <div class="sys-notice">V19.0 拖拽内核修复版</div>
+            <div class="sys-notice">V20.0 终极界面版</div>
         </div>
     </div>
 
     <div class="input-area-wrapper">
         <div class="input-bar">
-            <button class="btn-circle" onclick="toggleInput()">⌨️</button>
+            <button class="btn-circle" onclick="toggleInput()">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h2v2H6zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h2v2H6zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h12v2H6z"/></svg>
+            </button>
             <button id="btn-voice" class="btn-voice">按住 说话</button>
-            <input id="msg-input" type="text" placeholder="输入消息...">
-            <button class="btn-circle" onclick="sendText()" id="btn-send" style="display:none; background:var(--primary); color:white;">➤</button>
+            <input id="msg-input" type="text" placeholder="输入消息..." autocomplete="off">
+            <button class="btn-circle" onclick="sendText()" id="btn-send" style="display:none; color:var(--primary);">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
         </div>
     </div>
     <input type="file" id="file-input" multiple style="display:none">
@@ -192,11 +333,11 @@
         }
 
         function init() {
-            App.id = localStorage.getItem('sloth_v19') || (Math.floor(Math.random()*9000)+1000).toString();
-            localStorage.setItem('sloth_v19', App.id);
+            App.id = localStorage.getItem('sloth_v20') || (Math.floor(Math.random()*9000)+1000).toString();
+            localStorage.setItem('sloth_v20', App.id);
             document.getElementById('my-id').innerText = App.id;
             const qr = document.getElementById("qr-code");
-            if(qr && window.QRCode) new QRCode(qr, { text: App.id, width: 100, height: 100, colorDark: "#2D7CA8", colorLight: "#FFFFFF" });
+            if(qr && window.QRCode) new QRCode(qr, { text: App.id, width: 100, height: 100, colorDark: "#2B6CB0", colorLight: "#FFFFFF" });
 
             if(window.Peer) {
                 App.peer = new Peer(App.id, { debug: 1 });
@@ -234,44 +375,56 @@
         }
         function calcSpeed(bytes, ms) { return ms<=0?'':(bytes/ms*1000 > 1048576 ? (bytes/ms*1000/1048576).toFixed(1)+' MB/s' : (bytes/ms*1000/1024).toFixed(0)+' KB/s'); }
 
-        // --- 拖拽逻辑 (V14 稳定版回归) ---
+        // --- V20 修复：递归与拖拽逻辑优化 ---
         const dragOverlay = document.getElementById('drag-overlay');
         const dropCard = document.getElementById('drop-zone');
         let dragCounter = 0;
 
-        // 监听 document.body 确保全屏有效
-        document.body.addEventListener('dragenter', e => { e.preventDefault(); dragCounter++; dragOverlay.style.display='flex'; });
-        document.body.addEventListener('dragleave', e => { e.preventDefault(); dragCounter--; if(dragCounter===0) dragOverlay.style.display='none'; });
-        document.body.addEventListener('dragover', e => e.preventDefault());
+        document.addEventListener('dragenter', e => { e.preventDefault(); dragCounter++; dragOverlay.classList.add('active'); });
+        document.addEventListener('dragleave', e => { e.preventDefault(); dragCounter--; if(dragCounter===0) dragOverlay.classList.remove('active'); });
+        document.addEventListener('dragover', e => e.preventDefault());
         
-        document.body.addEventListener('drop', async e => {
+        document.addEventListener('drop', async e => {
             e.preventDefault(); 
-            dragCounter=0; 
-            dragOverlay.style.display='none';
+            dragCounter=0; dragOverlay.classList.remove('active'); dropCard.classList.remove('drag-active');
             
             const items = [...e.dataTransfer.items];
             let list = [];
             
-            // 优先尝试获取文件流
-            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                 for(let i=0; i<e.dataTransfer.files.length; i++) list.push(e.dataTransfer.files[i]);
-            } 
-            // 否则尝试解析 Entry (文件夹)
-            else {
-                for(let i of items){ 
-                    const ent = i.webkitGetAsEntry ? i.webkitGetAsEntry() : null;
-                    if(ent) list = list.concat(await scanEntry(ent));
-                    else if(i.kind==='file') list.push(i.getAsFile()); 
+            // 核心修复：优先检查 webkitGetAsEntry
+            for(let i of items){
+                const ent = i.webkitGetAsEntry ? i.webkitGetAsEntry() : null;
+                if(ent) {
+                    list = list.concat(await scanEntry(ent)); // 如果是 entry，一定走递归
+                } else if(i.kind === 'file') {
+                    list.push(i.getAsFile()); // 兜底
                 }
             }
-            
             if(list.length) enqueue(list);
-            else showToast("未识别到文件", "error");
+            else showToast("无法识别文件", "error");
         });
+
+        // 递归逻辑
+        async function scanEntry(entry) {
+            if (entry.isFile) {
+                return new Promise(resolve => entry.file(f => resolve([f])));
+            } 
+            if (entry.isDirectory) {
+                const reader = entry.createReader();
+                const entries = await new Promise((resolve, reject) => {
+                    reader.readEntries(resolve, reject); 
+                });
+                let files = [];
+                for (const sub of entries) {
+                    files = files.concat(await scanEntry(sub));
+                }
+                return files;
+            }
+            return [];
+        }
 
         document.getElementById('drop-zone').onclick = () => document.getElementById('file-input').click();
         document.getElementById('file-input').onchange = e => enqueue(e.target.files);
-        async function scanEntry(e){ if(e.isFile)return new Promise(r=>e.file(f=>r([f]))); if(e.isDirectory){const r=e.createReader();const ents=await new Promise(res=>r.readEntries(res));let a=[];for(let s of ents)a=a.concat(await scanEntry(s));return a;} return []; }
 
         function enqueue(files) {
             if(!App.connected) return showToast('请先连接设备', 'error');
@@ -322,11 +475,8 @@
             const el = document.getElementById(`msg-${id}`); if(!el) return;
             el.querySelector('.progress-bar').style.display='none'; el.querySelector('.speed-tag').innerText='完成';
             const url = URL.createObjectURL(new Blob(Rx.buf, {type: mime})); 
-            const filename = Rx.meta ? Rx.meta.name : 'file';
-            Rx.buf = [];
+            const filename = Rx.meta ? Rx.meta.name : 'file'; Rx.buf = [];
             const inner = el.querySelector('.file-inner'), thumbBox = el.querySelector('.thumb-box'), btnPreview = el.querySelector('.btn-preview');
-            
-            // 点击主体下载 (使用原始文件名)
             inner.onclick = () => { const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); };
 
             if (mime.includes('image')) {
@@ -343,7 +493,6 @@
             }
         }
 
-        // --- History API 修复灯箱 ---
         function openLightbox(url, type) {
             history.pushState({modal: 'lightbox'}, '', '#preview');
             const lb=document.getElementById('lightbox'), img=document.getElementById('lb-img'), vid=document.getElementById('lb-video'), pdf=document.getElementById('lb-pdf');
@@ -366,11 +515,8 @@
         
         window.toggleInput=()=>{
             const t=document.getElementById('msg-input'), v=document.getElementById('btn-voice'), s=document.getElementById('btn-send');
-            if(t.style.display==='none'){
-                t.style.display='block'; v.style.display='none'; s.style.display='block'; t.focus();
-            } else {
-                t.style.display='none'; v.style.display='block'; s.style.display='none';
-            }
+            if(t.style.display==='none'){ t.style.display='block'; v.style.display='none'; s.style.display='block'; t.focus(); } 
+            else { t.style.display='none'; v.style.display='block'; s.style.display='none'; }
         };
         window.sendText=()=>{const v=document.getElementById('msg-input').value;if(v){App.conn.send({type:'text',text:v});addMsg(v,'self');document.getElementById('msg-input').value='';}};
         function addMsg(t,w){const d=document.createElement('div');d.className=`msg-row ${w}`;d.innerHTML=`<div class="bubble">${t}</div>`;document.getElementById('chat-list').append(d);document.getElementById('chat-list').scrollTop=99999;}
