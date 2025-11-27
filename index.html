@@ -246,4 +246,114 @@
         document.addEventListener('drop', async e => {
             e.preventDefault(); dragCounter=0; dragOverlay.style.display='none';
             const items = [...e.dataTransfer.items], list = [];
-            for(let i of items){ const ent=i.webkitGetAsEntry?i.webkitGetAsEntry():null; if(ent) list=list.concat(await scanEntry
+            for(let i of items){ const ent=i.webkitGetAsEntry?i.webkitGetAsEntry():null; if(ent) list=list.concat(await scanEntry(ent)); else if(i.kind==='file') list.push(i.getAsFile()); }
+            if(list.length) enqueue(list);
+        });
+        document.getElementById('drop-zone').onclick = () => document.getElementById('file-input').click();
+        document.getElementById('file-input').onchange = e => enqueue(e.target.files);
+        async function scanEntry(e){ if(e.isFile)return new Promise(r=>e.file(f=>r([f]))); if(e.isDirectory){const r=e.createReader();const ents=await new Promise(res=>r.readEntries(res));let a=[];for(let s of ents)a=a.concat(await scanEntry(s));return a;} return []; }
+
+        function enqueue(files) {
+            if(!App.connected) return showToast('请先连接设备', 'error');
+            Array.from(files).forEach(f => { const id = 'f-'+Date.now()+Math.random().toString(36).substr(2); createFileItem(id, f.name, f.size, 'self', f.type); App.queue.push({f, id}); });
+            process();
+        }
+        function process() { if(App.isSending || !App.queue.length) return; App.isSending=true; sendFile(App.queue.shift()); }
+        function sendFile({f, id}) {
+            App.conn.send({type:'file-start', id, name:f.name, size:f.size, mime:f.type});
+            const reader = new FileReader(); let offset=0; let lastTime=Date.now(); let lastLoaded=0;
+            const push = () => { if(App.conn.dataChannel.bufferedAmount > 65536) { setTimeout(push, 20); return; } const s = f.slice(offset, offset + 32768); reader.readAsArrayBuffer(s); };
+            reader.onload = e => {
+                App.conn.send(e.target.result); offset += e.target.result.byteLength;
+                const now = Date.now();
+                if(now - lastTime > 500 || offset >= f.size) {
+                    const speed = calcSpeed(offset - lastLoaded, now - lastTime);
+                    updateProgress(id, offset, f.size, speed);
+                    lastLoaded = offset; lastTime = now;
+                }
+                if(offset < f.size) setTimeout(push, 0); else { App.conn.send({type:'file-end', id}); App.isSending=false; setTimeout(process, 100); }
+            };
+            push();
+        }
+
+        function createFileItem(id, name, size, who, mime) {
+            const div = document.createElement('div'); div.className = `msg-row ${who}`; div.id = `msg-${id}`;
+            let iconSvg = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>';
+            div.innerHTML = `
+                <div class="file-card">
+                    <div class="file-inner">
+                        <div class="thumb-box">${iconSvg}</div>
+                        <div class="file-info">
+                            <div class="file-name">${name}</div>
+                            <div class="file-meta"><span>${(size/1024).toFixed(1)} KB</span> <span class="speed-tag"></span></div>
+                            <div class="progress-bar"><div class="progress-fill"></div></div>
+                        </div>
+                    </div>
+                    <button class="btn-preview">👁️</button>
+                </div>`;
+            document.getElementById('chat-list').append(div);
+            document.getElementById('chat-list').scrollTop = 99999;
+        }
+        function updateProgress(id, cur, tot, speed) {
+            const el = document.getElementById(`msg-${id}`);
+            if(el) { el.querySelector('.progress-fill').style.width = (cur/tot*100)+'%'; if(speed) el.querySelector('.speed-tag').innerText = speed; }
+        }
+        function finishFile(id, mime) {
+            const el = document.getElementById(`msg-${id}`); if(!el) return;
+            el.querySelector('.progress-bar').style.display='none'; el.querySelector('.speed-tag').innerText='完成';
+            const url = URL.createObjectURL(new Blob(Rx.buf, {type: mime})); Rx.buf = [];
+            const inner = el.querySelector('.file-inner'), thumbBox = el.querySelector('.thumb-box'), btnPreview = el.querySelector('.btn-preview');
+            
+            // 点击文件主体：下载
+            inner.onclick = () => { const a=document.createElement('a'); a.href=url; a.download='file'; a.click(); };
+
+            // 预览逻辑 (图片、视频、PDF)
+            if (mime.includes('image')) {
+                thumbBox.innerHTML = `<img src="${url}" class="thumb-img">`; btnPreview.style.display = 'flex'; btnPreview.innerText = '👁️';
+                btnPreview.onclick = (e) => { e.stopPropagation(); openLightbox(url, 'img'); };
+            } else if (mime.includes('video')) {
+                const video = document.createElement('video'); video.src = url; video.currentTime = 1; video.className = 'thumb-img';
+                thumbBox.innerHTML = ''; thumbBox.appendChild(video);
+                btnPreview.innerHTML = '▶'; btnPreview.style.display = 'flex';
+                btnPreview.onclick = (e) => { e.stopPropagation(); openLightbox(url, 'video'); };
+            } else if (mime.includes('pdf')) {
+                btnPreview.innerHTML = '📄'; btnPreview.style.display = 'flex';
+                btnPreview.onclick = (e) => { e.stopPropagation(); openLightbox(url, 'pdf'); };
+            }
+        }
+
+        // --- 修复：灯箱逻辑 ---
+        function openLightbox(url, type) {
+            history.pushState({modal: 'lightbox'}, '', '#preview');
+            const lb=document.getElementById('lightbox'), img=document.getElementById('lb-img'), vid=document.getElementById('lb-video'), pdf=document.getElementById('lb-pdf');
+            
+            // 重置所有
+            img.style.display='none'; vid.style.display='none'; pdf.style.display='none';
+            lb.classList.add('active'); // 使用 class 控制显示，确保 flex 生效
+
+            if(type==='img') { img.src=url; img.style.display='block'; }
+            else if(type==='video') { vid.src=url; vid.style.display='block'; vid.play(); }
+            else if(type==='pdf') { pdf.src=url; pdf.style.display='block'; }
+        }
+
+        window.addEventListener('popstate', () => {
+            const lb = document.getElementById('lightbox');
+            lb.classList.remove('active');
+            document.getElementById('lb-video').pause();
+            document.getElementById('lb-pdf').src = ''; // 清空PDF防止后台加载
+        });
+
+        window.triggerClose = () => history.back();
+
+        const bVoice=document.getElementById('btn-voice'); let mRec, chunks=[];
+        const startR=async e=>{e.preventDefault();if(!App.connected)return;try{const s=await navigator.mediaDevices.getUserMedia({audio:true});mRec=new MediaRecorder(s);chunks=[];mRec.ondataavailable=e=>chunks.push(e.data);mRec.onstop=()=>enqueue([new File([new Blob(chunks)],"voice.webm",{type:'audio/webm'})]);mRec.start();bVoice.classList.add('recording');bVoice.innerText="松开 发送";}catch(e){showToast("麦克风错误", 'error');}};
+        const stopR=e=>{e.preventDefault();if(mRec)mRec.stop();bVoice.classList.remove('recording');bVoice.innerText="按住 说话";}
+        ['touchstart','mousedown'].forEach(k=>bVoice.addEventListener(k,startR)); ['touchend','mouseup'].forEach(k=>bVoice.addEventListener(k,stopR));
+        
+        window.toggleInput=()=>{const t=document.getElementById('msg-input'), v=document.getElementById('btn-voice'), s=document.getElementById('btn-send'); if(t.style.display==='none'){t.style.display='block';v.style.display='none';s.style.display='block';t.focus();}else{t.style.display='none';v.style.display='block';s.style.display='none';}};
+        window.sendText=()=>{const v=document.getElementById('msg-input').value;if(v){App.conn.send({type:'text',text:v});addMsg(v,'self');document.getElementById('msg-input').value='';}};
+        function addMsg(t,w){const d=document.createElement('div');d.className=`msg-row ${w}`;d.innerHTML=`<div class="bubble">${t}</div>`;document.getElementById('chat-list').append(d);document.getElementById('chat-list').scrollTop=99999;}
+        let qr; window.toggleScan=()=>{const s=document.getElementById('scanner-box');if(s.style.display==='block'){s.style.display='none';if(qr)qr.stop();}else{s.style.display='block';qr=new Html5Qrcode("reader");qr.start({facingMode:"environment"},{fps:10},t=>{document.getElementById('target-id').value=t;toggleScan();});}};
+    </script>
+</body>
+</html>
