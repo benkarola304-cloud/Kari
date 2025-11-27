@@ -1,9 +1,9 @@
-const CACHE_NAME = 'sloth-final-v8'; // 升级版本号，强制浏览器重新下载图片
+const CACHE_NAME = 'sloth-final-v9'; // 升级版本
 const FILES = [
     './', 
     './index.html', 
     './manifest.json',
-    './sloth.jpg',
+    './sloth.png',
     'https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
     'https://unpkg.com/html5-qrcode'
