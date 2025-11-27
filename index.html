@@ -9,231 +9,149 @@
     <title>闪电快传</title>
     
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="./Gemini_Generated_Image_lnxa7ilnxa7ilnxa.jpg">
+    <link rel="icon" href="./sloth.jpg">
+    <link rel="apple-touch-icon" href="./sloth.jpg">
     
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     
     <style>
-        /* --- 1. 全局设计语言 (Design Token) --- */
         :root {
-            /* 从树懒图片提取的色板 */
-            --primary: #2D7CA8; /* 领带蓝 - 主操作色 */
-            --primary-light: #EBF5FF;
-            --accent: #FF8F66; /* 花朵橙 - 录音/强调 */
-            --bg: #FFF8E7; /* 杏仁白 - 背景色 */
-            --surface: #FFFFFF; /* 纯白 - 卡片/气泡 */
-            --text-main: #3E3228; /* 深褐 - 主文字 */
-            --text-sub: #8D8176; /* 浅褐 - 次要文字 */
-            
-            --radius-L: 24px;
-            --radius-M: 16px;
-            --radius-S: 12px;
-            
+            --primary: #2D7CA8; --primary-light: #EBF5FF; --accent: #FF8F66;
+            --bg: #FFF8E7; --surface: #FFFFFF;
+            --text-main: #3E3228; --text-sub: #8D8176;
+            --radius-L: 24px; --radius-M: 16px;
             --shadow-float: 0 12px 30px rgba(62, 50, 40, 0.08);
             --shadow-card: 0 4px 12px rgba(62, 50, 40, 0.04);
-            --shadow-inner: inset 0 2px 4px rgba(0,0,0,0.02);
-            
             --safe-bottom: env(safe-area-inset-bottom);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); }
         
-        body { 
-            margin: 0; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; 
-            background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; 
-            color: var(--text-main);
-        }
-
-        /* --- 2. SVG 图标定义 (保持视觉一致性) --- */
         .icon { width: 24px; height: 24px; fill: currentColor; }
         .icon-lg { width: 32px; height: 32px; }
 
-        /* --- 3. 顶部导航 (Glassmorphism) --- */
+        /* 导航栏 */
         .navbar {
-            height: 64px; padding: 0 20px; 
-            background: rgba(255, 248, 231, 0.85); /* 半透明背景 */
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            display: flex; justify-content: space-between; align-items: center; 
-            z-index: 50; flex-shrink: 0;
-            border-bottom: 1px solid rgba(0,0,0,0.03);
+            height: 64px; padding: 0 20px; background: rgba(255, 248, 231, 0.85); backdrop-filter: blur(12px);
+            display: flex; justify-content: space-between; align-items: center; z-index: 50; flex-shrink: 0; border-bottom: 1px solid rgba(0,0,0,0.03);
         }
         .brand { display: flex; align-items: center; gap: 12px; }
         .app-logo { 
-            width: 40px; height: 40px; border-radius: 50%; 
-            border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            object-fit: cover;
+            width: 40px; height: 40px; border-radius: 50%; border: 2px solid white; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover; background: #eee;
         }
-        .app-name { font-size: 18px; font-weight: 800; color: var(--text-main); letter-spacing: 0.5px; }
-
-        .status-pill { 
-            font-size: 12px; padding: 6px 14px; border-radius: 20px; 
-            background: rgba(0,0,0,0.05); color: var(--text-sub); font-weight: 600; 
-            display: flex; align-items: center; gap: 6px; transition: 0.3s;
-        }
+        .app-name { font-size: 18px; font-weight: 800; color: var(--text-main); }
+        .status-pill { font-size: 12px; padding: 6px 14px; border-radius: 20px; background: rgba(0,0,0,0.05); color: var(--text-sub); font-weight: 600; display: flex; align-items: center; gap: 6px; }
         .status-pill.online { background: #D1F2EB; color: #0E6251; }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
 
-        /* --- 4. 主内容布局 --- */
+        /* 主界面 */
         .main-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-
-        /* 文件投递区 (精品卡片风格) */
         .drop-zone-wrapper { padding: 16px 20px 0 20px; flex-shrink: 0; }
         .drop-card {
-            height: 110px; background: var(--surface); border-radius: var(--radius-L);
-            border: 2px dashed #E0D6CC; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-            color: var(--primary); box-shadow: var(--shadow-card);
+            height: 100px; background: var(--surface); border-radius: var(--radius-L); border: 2px dashed #E0D6CC;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;
+            color: var(--primary); box-shadow: var(--shadow-card); transition: 0.2s;
         }
         .drop-card:active { transform: scale(0.98); background: var(--primary-light); border-color: var(--primary); }
         .drop-label { font-size: 14px; font-weight: 600; color: var(--text-sub); margin-top: 8px; }
 
-        /* 聊天列表 */
-        .chat-scroll {
-            flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
-            scroll-behavior: smooth;
-        }
+        .chat-scroll { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
         .sys-notice { text-align: center; font-size: 12px; color: var(--text-sub); opacity: 0.7; margin: 10px 0; }
 
-        /* 消息气泡 */
+        /* 消息样式 */
         .msg-row { display: flex; width: 100%; margin-bottom: 4px; }
-        .msg-row.self { justify-content: flex-end; }
-        .msg-row.peer { justify-content: flex-start; }
-
-        .bubble {
-            max-width: 80%; padding: 12px 16px; border-radius: var(--radius-M);
-            font-size: 15px; line-height: 1.5; box-shadow: var(--shadow-card);
-            position: relative; overflow: hidden;
-        }
+        .msg-row.self { justify-content: flex-end; } .msg-row.peer { justify-content: flex-start; }
+        .bubble { max-width: 80%; padding: 12px 16px; border-radius: var(--radius-M); font-size: 15px; line-height: 1.5; box-shadow: var(--shadow-card); }
         .msg-row.self .bubble { background: var(--primary); color: white; border-bottom-right-radius: 4px; }
         .msg-row.peer .bubble { background: var(--surface); color: var(--text-main); border-bottom-left-radius: 4px; }
 
         /* 文件卡片 */
-        .file-card { width: 240px; padding: 0; background: transparent; box-shadow: none; }
-        .file-inner { 
-            background: var(--surface); border-radius: var(--radius-M); padding: 12px; 
-            display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-card);
-        }
+        .file-card { width: 250px; padding: 0; background: transparent; box-shadow: none; }
+        .file-inner { background: var(--surface); border-radius: var(--radius-M); padding: 12px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-card); position: relative; }
         .msg-row.self .file-inner { background: rgba(255,255,255,0.15); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); }
-        
-        .file-icon-box { 
-            width: 44px; height: 44px; border-radius: 12px; background: #F3F4F6; color: var(--text-sub);
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-        }
+        .file-icon-box { width: 44px; height: 44px; border-radius: 12px; background: #F3F4F6; color: var(--text-sub); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .msg-row.self .file-icon-box { background: rgba(255,255,255,0.2); color: white; }
-
         .file-info { flex: 1; overflow: hidden; }
         .file-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .file-meta { font-size: 11px; opacity: 0.7; margin-top: 2px; }
         .msg-row.self .file-name, .msg-row.self .file-meta { color: white; }
-
         .progress-bar { height: 4px; background: rgba(0,0,0,0.05); margin-top: 8px; border-radius: 2px; overflow: hidden; width: 100%; }
         .progress-fill { height: 100%; width: 0%; background: var(--primary); transition: width 0.2s; }
-        .msg-row.self .progress-bar { background: rgba(0,0,0,0.2); }
         .msg-row.self .progress-fill { background: white; }
+        .action-overlay { position: absolute; right: 12px; top: 12px; bottom: 12px; display: none; align-items: center; }
+        .btn-action { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-        /* --- 5. 底部输入栏 (核心修复：防溢出) --- */
-        .input-area-wrapper {
-            background: var(--surface); 
-            padding: 10px 16px;
-            padding-bottom: max(10px, var(--safe-bottom));
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.03);
-            z-index: 50;
-        }
-        .input-bar {
-            display: flex; align-items: center; gap: 10px; /* 关键：间距 */
-            height: 48px;
-        }
-
-        /* 按钮统一风格 */
-        .btn-circle {
-            width: 44px; height: 44px; border-radius: 50%; border: none;
-            background: #F2F0EB; color: var(--text-sub);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.2s; flex-shrink: 0; /* 关键：禁止被压缩 */
-        }
-        .btn-circle:active { transform: scale(0.92); background: #E5E3DE; }
-        .btn-circle.primary { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(45, 124, 168, 0.3); }
-        
-        /* 录音按钮 */
-        .btn-voice-long {
-            flex: 1; height: 44px; border-radius: 24px; border: none;
-            background: #F2F0EB; color: var(--text-main); font-weight: 700; font-size: 15px;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            user-select: none; touch-action: none; cursor: pointer;
-        }
-        .btn-voice-long.recording { background: var(--accent); color: white; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(255,143,102,0.4)} 70%{box-shadow:0 0 0 10px rgba(255,143,102,0)} 100%{box-shadow:0 0 0 0 rgba(0,0,0,0)} }
-
-        /* 文本输入框 (修复：宽度自适应) */
-        #msg-input {
-            flex: 1; height: 44px; padding: 0 18px; border-radius: 24px;
-            background: #F2F0EB; border: 1px solid transparent; outline: none;
-            font-size: 16px; color: var(--text-main); display: none;
-            min-width: 0; /* 关键：允许 Flex 子项收缩 */
-        }
+        /* 底部栏 */
+        .input-area-wrapper { background: var(--surface); padding: 10px 16px; padding-bottom: max(10px, var(--safe-bottom)); box-shadow: 0 -4px 20px rgba(0,0,0,0.03); z-index: 50; }
+        .input-bar { display: flex; align-items: center; gap: 10px; height: 48px; }
+        .btn-circle { width: 44px; height: 44px; border-radius: 50%; border: none; background: #F2F0EB; color: var(--text-sub); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: 0.2s; }
+        .btn-circle:active { transform: scale(0.9); }
+        .btn-circle.primary { background: var(--primary); color: white; }
+        .btn-voice-long { flex: 1; height: 44px; border-radius: 24px; border: none; background: #F2F0EB; color: var(--text-main); font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; user-select: none;}
+        .btn-voice-long.recording { background: var(--accent); color: white; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%{opacity:1} 50%{opacity:0.7} 100%{opacity:1} }
+        #msg-input { flex: 1; height: 44px; padding: 0 18px; border-radius: 24px; background: #F2F0EB; border: 1px solid transparent; outline: none; font-size: 16px; display: none; min-width: 0; }
         #msg-input:focus { background: white; border-color: var(--primary); }
 
-        /* --- 6. 弹窗 (Modal) --- */
-        .modal {
-            position: fixed; inset: 0; background: rgba(255,248,231,0.95); z-index: 100;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            backdrop-filter: blur(5px);
-        }
-        .card { 
-            width: 86%; max-width: 380px; background: var(--surface); padding: 32px 24px;
-            border-radius: 32px; text-align: center; box-shadow: var(--shadow-float);
-            animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-
-        .hero-img { width: 100px; height: 100px; border-radius: 50%; border: 4px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.1); margin-bottom: 16px; object-fit: cover;}
+        /* 弹窗 & 动画 */
+        .modal { position: fixed; inset: 0; background: rgba(255,248,231,0.95); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .card { width: 86%; max-width: 380px; background: var(--surface); padding: 32px 24px; border-radius: 32px; text-align: center; box-shadow: var(--shadow-float); }
         
-        .id-display { 
-            background: #F7F9FC; padding: 12px; border-radius: 12px; margin: 20px 0;
-            border: 1px dashed #D0D7DE; color: var(--text-main); font-family: monospace; font-size: 18px; font-weight: bold;
+        /* 修复：头像样式与动画 */
+        .hero-img { 
+            width: 100px; height: 100px; border-radius: 50%; 
+            border: 4px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
+            margin-bottom: 16px; object-fit: cover; background-color: #eee;
+            /* 新增：呼吸浮动动画 */
+            animation: float-breathe 4s ease-in-out infinite;
         }
-        
-        .input-id { 
-            width: 100%; height: 50px; border-radius: 16px; border: 2px solid #F0F0F0;
-            text-align: center; font-size: 16px; font-weight: 600; outline: none;
-            background: #FAFAFA; margin-bottom: 16px; transition: 0.2s;
+        @keyframes float-breathe {
+            0% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-8px) scale(1.02); box-shadow: 0 15px 25px rgba(0,0,0,0.15); }
+            100% { transform: translateY(0px) scale(1); }
         }
-        .input-id:focus { border-color: var(--primary); background: white; }
 
-        .btn-block {
-            width: 100%; height: 50px; border-radius: 16px; border: none;
-            background: var(--primary); color: white; font-size: 16px; font-weight: 700;
-            cursor: pointer; box-shadow: 0 4px 12px rgba(45, 124, 168, 0.25);
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .btn-ghost { background: #F2F0EB; color: var(--text-main); box-shadow: none; }
-
-        /* 隐藏元素 */
+        .id-display { background: #F7F9FC; padding: 12px; border-radius: 12px; margin: 20px 0; border: 1px dashed #D0D7DE; font-family: monospace; font-weight: bold; font-size: 18px; }
+        .input-id { width: 100%; height: 50px; border-radius: 16px; border: 2px solid #F0F0F0; text-align: center; font-size: 16px; background: #FAFAFA; margin-bottom: 16px; outline: none;}
+        .btn-block { width: 100%; height: 50px; border-radius: 16px; border: none; background: var(--primary); color: white; font-weight: 700; font-size: 16px; }
+        .btn-ghost { background: #F2F0EB; color: var(--text-main); }
         #scanner-box { border-radius: 20px; overflow: hidden; margin-bottom: 15px; display: none; height: 250px; background: black; }
-        
+
+        /* 灯箱 */
+        .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; opacity: 0; transition: opacity 0.3s; }
+        .lightbox.active { display: flex; opacity: 1; }
+        .lightbox-content { max-width: 100%; max-height: 90vh; object-fit: contain; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .lightbox-header { position: absolute; top: 0; left: 0; right: 0; padding: 20px; display: flex; justify-content: flex-end; z-index: 2001; }
+        .btn-close { background: rgba(255,255,255,0.2); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
     </style>
 </head>
 <body>
 
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <div class="lightbox-header"><button class="btn-close" onclick="closeLightbox()">×</button></div>
+        <img id="lb-img" class="lightbox-content" style="display:none" onclick="event.stopPropagation()">
+        <video id="lb-video" class="lightbox-content" controls style="display:none" onclick="event.stopPropagation()"></video>
+    </div>
+
     <div class="modal" id="modal">
         <div class="card">
-            <img src="./Gemini_Generated_Image_lnxa7ilnxa7ilnxa.jpg" class="hero-img">
+            <img src="./sloth.jpg" class="hero-img" alt="Logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTIiLz48L3N2Zz4='">
             <h2 style="margin:0; font-size:22px; color:var(--text-main)">闪电快传</h2>
-            <p style="color:var(--text-sub); font-size:13px; margin:5px 0 20px 0">极速 · 局域网 · 零流量</p>
+            <p style="color:var(--text-sub); font-size:13px; margin:5px 0 20px 0">极速 · 影音 · 局域网</p>
             
             <div id="qr-code" style="display:inline-block; padding:8px; background:white; border-radius:12px; box-shadow:var(--shadow-card)"></div>
-            <div class="id-display" id="my-id">生成中...</div>
+            <div class="id-display" id="my-id">...</div>
             
             <input type="text" id="target-id" class="input-id" placeholder="输入对方 ID" autocomplete="off">
             <div id="scanner-box"><div id="reader" style="width:100%;height:100%"></div></div>
 
             <div style="display:flex; gap:12px;">
-                <button class="btn-block btn-ghost" onclick="toggleScan()" style="flex:1">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6zM2 2v10h10V2H2zm12 0v10h10V2H14zM2 14v10h10V14H2zm12 0v10h10V14H14z"/></svg>
-                </button>
+                <button class="btn-block btn-ghost" onclick="toggleScan()" style="flex:1">📷</button>
                 <button class="btn-block" onclick="connect()" style="flex:2">连接设备</button>
             </div>
         </div>
@@ -241,352 +159,161 @@
 
     <div class="navbar">
         <div class="brand">
-            <img src="./Gemini_Generated_Image_lnxa7ilnxa7ilnxa.jpg" class="app-logo">
+            <img src="./sloth.jpg" class="app-logo" onerror="this.style.background='#ccc'">
             <span class="app-name">闪电快传</span>
         </div>
-        <div class="status-pill" id="status">
-            <div class="dot"></div>
-            <span>离线</span>
-        </div>
+        <div class="status-pill" id="status"><div class="dot"></div><span>离线</span></div>
     </div>
 
     <div class="main-container">
         <div class="drop-zone-wrapper">
             <div class="drop-card" id="drop-zone">
-                <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                <span class="drop-label">点击或拖拽文件到这里</span>
+                <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                <span class="drop-label">点击或拖拽 发送文件</span>
             </div>
         </div>
-
         <div class="chat-scroll" id="chat-list">
-            <div class="sys-notice">已启用屏幕常亮保活模式<br>支持多文件、文件夹混传</div>
+            <div class="sys-notice">V8.0 修复版<br>支持图片预览、视频即点即播</div>
         </div>
     </div>
 
     <div class="input-area-wrapper">
         <div class="input-bar">
             <button class="btn-circle" onclick="toggleInputMode()">
-                <svg class="icon" id="icon-kb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h2v2H6zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h2v2H6zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h12v2H6z"/></svg>
-                </button>
-            
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h2v2H6zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h2v2H6zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h12v2H6z"/></svg>
+            </button>
             <button id="btn-voice" class="btn-voice-long">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
                 <span>按住 说话</span>
             </button>
-            
             <input id="msg-input" type="text" placeholder="输入消息..." autocomplete="off">
-            
             <button class="btn-circle primary" id="btn-send" style="display:none;" onclick="sendText()">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </button>
-            
             <button class="btn-circle" id="btn-plus" onclick="document.getElementById('file-input').click()">
                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
         </div>
     </div>
-
     <input type="file" id="file-input" multiple style="display:none">
 
     <script>
-        // --- 系统状态 ---
-        const App = {
-            id: null, peer: null, conn: null, connected: false,
-            queue: [], isSending: false, wakeLock: null
-        };
-        
-        // --- 1. 启动 & 唤醒锁 ---
-        async function requestWakeLock() {
-            if ('wakeLock' in navigator) {
-                try { App.wakeLock = await navigator.wakeLock.request('screen'); } 
-                catch (e) { console.log('WakeLock:', e); }
-            }
-        }
-        document.addEventListener('visibilitychange', async () => {
-            if (App.wakeLock && document.visibilityState === 'visible') requestWakeLock();
-        });
+        const App = { id: null, peer: null, conn: null, connected: false, queue: [], isSending: false, wakeLock: null };
+        async function requestWakeLock() { if ('wakeLock' in navigator) { try { App.wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {} } }
+        document.addEventListener('visibilitychange', async () => { if (App.wakeLock && document.visibilityState==='visible') requestWakeLock(); });
 
-        // --- 2. 初始化 ---
         function init() {
-            // 简单 ID
-            App.id = localStorage.getItem('sloth_v6') || (Math.floor(Math.random()*9000)+1000).toString();
-            localStorage.setItem('sloth_v6', App.id);
+            App.id = localStorage.getItem('sloth_v8') || (Math.floor(Math.random()*9000)+1000).toString();
+            localStorage.setItem('sloth_v8', App.id);
             document.getElementById('my-id').innerText = App.id;
-            
-            // 生成二维码 (使用主色调)
-            new QRCode(document.getElementById("qr-code"), { 
-                text: App.id, width: 90, height: 90, 
-                colorDark: "#2D7CA8", colorLight: "#FFFFFF" 
-            });
+            new QRCode(document.getElementById("qr-code"), { text: App.id, width: 90, height: 90, colorDark: "#2D7CA8", colorLight: "#FFFFFF" });
             
             App.peer = new Peer(App.id, { debug: 1 });
-            App.peer.on('open', () => { 
-                const el = document.getElementById('status');
-                el.querySelector('span').innerText = '等待连接';
-                requestWakeLock();
-            });
-            App.peer.on('connection', conn => {
-                if(confirm('是否连接 ID: ' + conn.peer + '?')) setupConn(conn);
-            });
-            App.peer.on('error', err => alert('PeerJS Error: ' + err.type));
+            App.peer.on('open', () => { document.querySelector('#status span').innerText='等待连接'; requestWakeLock(); });
+            App.peer.on('connection', conn => { if(confirm('连接 ID: '+conn.peer+'?')) setupConn(conn); });
+            App.peer.on('error', err => alert('Err: '+err.type));
         }
-
-        function connect() {
-            const tid = document.getElementById('target-id').value.trim();
-            if(!tid) return;
-            setupConn(App.peer.connect(tid, { reliable: true }));
-        }
-
+        function connect() { const tid = document.getElementById('target-id').value.trim(); if(tid) setupConn(App.peer.connect(tid, { reliable: true })); }
         function setupConn(conn) {
-            if(App.conn) App.conn.close();
-            App.conn = conn;
+            if(App.conn) App.conn.close(); App.conn = conn;
             conn.on('open', () => conn.send({ type: 'handshake' }));
             conn.on('data', handleData);
             conn.on('close', () => location.reload());
         }
-
         function setConnected() {
-            App.connected = true;
-            document.getElementById('modal').style.display = 'none';
-            const pill = document.getElementById('status');
-            pill.classList.add('online');
-            pill.querySelector('span').innerText = '已连接';
+            App.connected = true; document.getElementById('modal').style.display = 'none';
+            const s = document.getElementById('status'); s.classList.add('online'); s.querySelector('span').innerText='已连接';
             requestWakeLock();
         }
 
-        // --- 3. 数据处理 ---
         let Rx = { buf: [], size: 0, meta: null };
-
         function handleData(data) {
             if (data.type) {
-                if(data.type === 'handshake') {
-                    if(!App.connected) App.conn.send({ type: 'handshake' });
-                    setConnected();
-                }
+                if(data.type === 'handshake') { if(!App.connected) App.conn.send({type:'handshake'}); setConnected(); }
                 else if(data.type === 'text') addMsg(data.text, 'peer');
-                else if(data.type === 'file-start') {
-                    Rx = { buf: [], size: 0, meta: data };
-                    createFileItem(data.id, data.name, data.size, 'peer', data.mime);
-                }
-                else if(data.type === 'file-end') {
-                    finishFile(data.id, Rx.meta.mime);
-                }
-            } else {
-                Rx.buf.push(data);
-                Rx.size += data.byteLength;
-                updateProgress(Rx.meta.id, Rx.size, Rx.meta.size);
-            }
+                else if(data.type === 'file-start') { Rx = { buf: [], size: 0, meta: data }; createFileItem(data.id, data.name, data.size, 'peer', data.mime); }
+                else if(data.type === 'file-end') finishFile(data.id, Rx.meta.mime);
+            } else { Rx.buf.push(data); Rx.size += data.byteLength; updateProgress(Rx.meta.id, Rx.size, Rx.meta.size); }
         }
 
-        // --- 4. 拖拽逻辑 (文件夹支持) ---
         const dropZone = document.getElementById('drop-zone');
-        dropZone.onclick = () => document.getElementById('file-input').click();
-        dropZone.ondragover = e => { e.preventDefault(); dropZone.style.borderColor = 'var(--primary)'; };
-        dropZone.ondragleave = () => dropZone.style.borderColor = '#E0D6CC';
-        
-        dropZone.ondrop = async (e) => {
-            e.preventDefault(); dropZone.style.borderColor = '#E0D6CC';
-            const items = [...e.dataTransfer.items];
-            let list = [];
-            for (let item of items) {
-                const entry = item.webkitGetAsEntry ? item.webkitGetAsEntry() : null;
-                if (entry) list = list.concat(await scanEntry(entry));
-                else if (item.kind === 'file') list.push(item.getAsFile());
-            }
+        dropZone.onclick=()=>document.getElementById('file-input').click();
+        dropZone.ondragover=e=>{e.preventDefault();dropZone.style.borderColor='var(--primary)'};
+        dropZone.ondragleave=()=>dropZone.style.borderColor='#E0D6CC';
+        dropZone.ondrop=async e=>{
+            e.preventDefault(); dropZone.style.borderColor='#E0D6CC';
+            const items=[...e.dataTransfer.items], list=[];
+            for(let i of items){ const ent=i.webkitGetAsEntry?i.webkitGetAsEntry():null; if(ent) list=list.concat(await scanEntry(ent)); else if(i.kind==='file') list.push(i.getAsFile()); }
             if(list.length) enqueue(list);
         };
-
-        async function scanEntry(entry) {
-            if (entry.isFile) return new Promise(r => entry.file(f => r([f])));
-            if (entry.isDirectory) {
-                const rdr = entry.createReader();
-                const entries = await new Promise(r => rdr.readEntries(r));
-                let res = [];
-                for(let e of entries) res = res.concat(await scanEntry(e));
-                return res;
-            }
-            return [];
+        async function scanEntry(e){
+            if(e.isFile) return new Promise(r=>e.file(f=>r([f])));
+            if(e.isDirectory){ const r=e.createReader(); const ents=await new Promise(res=>r.readEntries(res)); let arr=[]; for(let sub of ents) arr=arr.concat(await scanEntry(sub)); return arr; } return [];
         }
+        document.getElementById('file-input').onchange=e=>enqueue(e.target.files);
 
-        document.getElementById('file-input').onchange = (e) => enqueue(e.target.files);
-
-        // --- 5. 发送逻辑 ---
         function enqueue(files) {
-            if(!App.connected) return alert('请先连接');
-            Array.from(files).forEach(f => {
-                const id = 'f-'+Date.now()+Math.random().toString(16).substr(2,4);
-                createFileItem(id, f.name, f.size, 'self', f.type);
-                App.queue.push({ f, id });
-            });
+            if(!App.connected) return alert('请连接');
+            Array.from(files).forEach(f => { const id = 'f-'+Date.now()+Math.random().toString(16).substr(2,4); createFileItem(id, f.name, f.size, 'self', f.type); App.queue.push({ f, id }); });
             processQueue();
         }
-
-        function processQueue() {
-            if(App.isSending || !App.queue.length) return;
-            App.isSending = true;
-            sendFile(App.queue.shift());
-        }
-
+        function processQueue() { if(App.isSending || !App.queue.length) return; App.isSending = true; sendFile(App.queue.shift()); }
         function sendFile({ f, id }) {
             App.conn.send({ type:'file-start', id, name:f.name, size:f.size, mime:f.type });
-            const reader = new FileReader();
-            let offset = 0;
-            const push = () => {
-                if(App.conn.dataChannel.bufferedAmount > 65536) { setTimeout(push, 20); return; }
-                const slice = f.slice(offset, offset + 32768);
-                reader.readAsArrayBuffer(slice);
-            };
-            reader.onload = e => {
-                App.conn.send(e.target.result);
-                offset += e.target.result.byteLength;
-                updateProgress(id, offset, f.size);
-                if(offset < f.size) setTimeout(push, 0);
-                else {
-                    App.conn.send({ type:'file-end', id });
-                    App.isSending = false;
-                    setTimeout(processQueue, 100);
-                }
+            const r = new FileReader(); let off=0;
+            const push=()=>{ if(App.conn.dataChannel.bufferedAmount>65536){setTimeout(push,20);return;} const s = f.slice(off, off+32768); r.readAsArrayBuffer(s); };
+            r.onload=e=>{
+                App.conn.send(e.target.result); off+=e.target.result.byteLength; updateProgress(id, off, f.size);
+                if(off<f.size) setTimeout(push,0); else { App.conn.send({type:'file-end', id}); App.isSending=false; setTimeout(processQueue,100); }
             };
             push();
         }
 
-        // --- 6. 语音功能 ---
-        let mediaRec; let chunks = [];
-        const btnVoice = document.getElementById('btn-voice');
-
-        const startRec = async (e) => {
-            e.preventDefault();
-            if(!App.connected) return alert('请连接');
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRec = new MediaRecorder(stream);
-                chunks = [];
-                mediaRec.ondataavailable = e => chunks.push(e.data);
-                mediaRec.onstop = sendVoice;
-                mediaRec.start();
-                btnVoice.classList.add('recording');
-                btnVoice.querySelector('span').innerText = "松开 发送";
-            } catch(e) { alert("麦克风不可用 (需 HTTPS/Localhost)"); }
+        let mRec, chunks=[]; const bVoice=document.getElementById('btn-voice');
+        const startR=async e=>{
+            e.preventDefault(); if(!App.connected) return alert('请连接');
+            try { const s=await navigator.mediaDevices.getUserMedia({audio:true}); mRec=new MediaRecorder(s); chunks=[]; mRec.ondataavailable=e=>chunks.push(e.data); mRec.onstop=()=>{ enqueue([new File([new Blob(chunks,{type:'audio/webm'})],"voice.webm",{type:'audio/webm'})]) }; mRec.start(); bVoice.classList.add('recording'); bVoice.querySelector('span').innerText="松开 发送"; } catch(err){alert("麦克风不可用");}
         };
+        const stopR=e=>{ e.preventDefault(); if(mRec&&mRec.state!=='inactive'){mRec.stop(); bVoice.classList.remove('recording'); bVoice.querySelector('span').innerText="按住 说话";} };
+        ['touchstart','mousedown'].forEach(k=>bVoice.addEventListener(k,startR));
+        ['touchend','mouseup'].forEach(k=>bVoice.addEventListener(k,stopR));
 
-        const stopRec = (e) => {
-            e.preventDefault();
-            if(mediaRec && mediaRec.state !== 'inactive') {
-                mediaRec.stop();
-                btnVoice.classList.remove('recording');
-                btnVoice.querySelector('span').innerText = "按住 说话";
-            }
-        };
-
-        ['touchstart','mousedown'].forEach(ev => btnVoice.addEventListener(ev, startRec));
-        ['touchend','mouseup'].forEach(ev => btnVoice.addEventListener(ev, stopRec));
-
-        function sendVoice() {
-            const file = new File([new Blob(chunks, {type:'audio/webm'})], "voice.webm", {type:'audio/webm'});
-            enqueue([file]);
+        function openLightbox(url, type) {
+            const lb = document.getElementById('lightbox'), img = document.getElementById('lb-img'), vid = document.getElementById('lb-video');
+            img.style.display = 'none'; vid.style.display = 'none'; lb.classList.add('active');
+            if (type === 'img') { img.src = url; img.style.display = 'block'; } else { vid.src = url; vid.style.display = 'block'; vid.play(); }
         }
-
-        // --- 7. UI 操作 ---
-        function toggleInputMode() {
-            const v = document.getElementById('btn-voice');
-            const t = document.getElementById('msg-input');
-            const s = document.getElementById('btn-send');
-            const p = document.getElementById('btn-plus');
-            
-            if(t.style.display === 'none') {
-                v.style.display = 'none'; t.style.display = 'block'; s.style.display = 'block'; p.style.display = 'none';
-                t.focus();
-            } else {
-                v.style.display = 'flex'; t.style.display = 'none'; s.style.display = 'none'; p.style.display = 'flex';
-            }
-        }
-
-        function sendText() {
-            const v = document.getElementById('msg-input').value;
-            if(v) {
-                App.conn.send({ type: 'text', text: v });
-                addMsg(v, 'self');
-                document.getElementById('msg-input').value = '';
-            }
-        }
-
-        function addMsg(txt, who) {
-            const div = document.createElement('div');
-            div.className = `msg-row ${who}`;
-            div.innerHTML = `<div class="bubble">${txt}</div>`;
-            append(div);
-        }
+        window.closeLightbox = () => { document.getElementById('lightbox').classList.remove('active'); document.getElementById('lb-video').pause(); };
 
         function createFileItem(id, name, size, who, mime) {
-            const div = document.createElement('div');
-            div.className = `msg-row ${who}`;
-            div.id = `msg-${id}`;
-            const isVoice = mime.includes('audio');
-            // SVG 图标: 语音 或 文件
-            const iconSvg = isVoice 
-                ? '<svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/></svg>'
-                : '<svg class="icon" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>';
-            
-            div.innerHTML = `
-                <div class="file-card">
-                    <div class="file-inner">
-                        <div class="file-icon-box">${iconSvg}</div>
-                        <div class="file-info">
-                            <div class="file-name">${isVoice ? '语音消息' : name}</div>
-                            <div class="file-meta">${(size/1024).toFixed(1)} KB</div>
-                            <div class="progress-bar"><div class="progress-fill"></div></div>
-                        </div>
-                    </div>
-                </div>`;
-            append(div);
+            const div = document.createElement('div'); div.className = `msg-row ${who}`; div.id = `msg-${id}`;
+            let iconSvg;
+            if (mime.includes('image')) iconSvg = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+            else if (mime.includes('video')) iconSvg = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>';
+            else iconSvg = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>';
+            div.innerHTML = `<div class="file-card"><div class="file-inner"><div class="file-icon-box">${iconSvg}</div><div class="file-info"><div class="file-name">${name}</div><div class="file-meta">${(size/1024).toFixed(1)} KB</div><div class="progress-bar"><div class="progress-fill"></div></div></div><div class="action-overlay"><button class="btn-action">查看</button></div></div></div>`;
+            document.getElementById('chat-list').appendChild(div); document.getElementById('chat-list').scrollTop = 99999;
         }
 
-        function updateProgress(id, cur, tot) {
-            const el = document.getElementById(`msg-${id}`);
-            if(el) el.querySelector('.progress-fill').style.width = (cur/tot*100)+'%';
-        }
-
+        function updateProgress(id, cur, tot) { const el = document.getElementById(`msg-${id}`); if(el) el.querySelector('.progress-fill').style.width = (cur/tot*100)+'%'; }
         function finishFile(id, mime) {
-            const el = document.getElementById(`msg-${id}`);
-            if(!el) return;
-            el.querySelector('.progress-bar').style.display='none';
-            
-            const url = URL.createObjectURL(new Blob(Rx.buf, {type:mime}));
-            Rx.buf = [];
-            
-            // 点击行为
-            const inner = el.querySelector('.file-inner');
-            inner.style.cursor = 'pointer';
-            inner.onclick = () => {
-                if(mime.includes('image')) window.open(url);
-                else if(mime.includes('audio')) new Audio(url).play();
-                else {
-                    const a = document.createElement('a');
-                    a.href = url; a.download = 'file'; a.click();
-                }
-            };
-            // 简单反馈
-            el.querySelector('.file-meta').innerText += ' • 已接收 (点击打开)';
+            const el = document.getElementById(`msg-${id}`); if(!el) return;
+            el.querySelector('.progress-bar').style.display = 'none';
+            const url = URL.createObjectURL(new Blob(Rx.buf, {type: mime})); Rx.buf = [];
+            const inner = el.querySelector('.file-inner'), overlay = el.querySelector('.action-overlay'), btn = el.querySelector('.btn-action');
+            if (mime.includes('image')) { btn.innerText = "预览图片"; overlay.style.display = 'flex'; inner.onclick = () => openLightbox(url, 'img'); } 
+            else if (mime.includes('video')) { btn.innerText = "播放视频"; overlay.style.display = 'flex'; inner.onclick = () => openLightbox(url, 'video'); } 
+            else if (mime.includes('audio')) { btn.innerText = "播放语音"; overlay.style.display = 'flex'; inner.onclick = () => new Audio(url).play(); } 
+            else { btn.innerText = "下载"; overlay.style.display = 'flex'; inner.onclick = () => { const a=document.createElement('a'); a.href=url; a.download='file'; a.click(); }; }
         }
 
-        function append(el) {
-            const c = document.getElementById('chat-list');
-            c.appendChild(el); c.scrollTop = c.scrollHeight;
+        function toggleInputMode() {
+            const t=document.getElementById('msg-input'), v=document.getElementById('btn-voice'), s=document.getElementById('btn-send'), p=document.getElementById('btn-plus');
+            if(t.style.display==='none'){ t.style.display='block'; v.style.display='none'; s.style.display='block'; p.style.display='none'; t.focus(); } else{ t.style.display='none'; v.style.display='flex'; s.style.display='none'; p.style.display='flex'; }
         }
-
-        // 扫码
-        let html5QrCode;
-        window.toggleScan = () => {
-            const s = document.getElementById('scanner-box');
-            if(s.style.display === 'block') { s.style.display='none'; if(html5QrCode) html5QrCode.stop(); }
-            else {
-                s.style.display = 'block';
-                html5QrCode = new Html5Qrcode("reader");
-                html5QrCode.start({ facingMode: "environment" }, {fps:10}, t => {
-                    document.getElementById('target-id').value = t; toggleScan();
-                });
-            }
-        };
+        function sendText(){ const v=document.getElementById('msg-input').value; if(v){ App.conn.send({type:'text',text:v}); addMsg(v,'self'); document.getElementById('msg-input').value=''; } }
+        function addMsg(t,w){ const d=document.createElement('div'); d.className=`msg-row ${w}`; d.innerHTML=`<div class="bubble">${t}</div>`; document.getElementById('chat-list').append(d); document.getElementById('chat-list').scrollTop=99999; }
+        let qr; window.toggleScan=()=>{ const s=document.getElementById('scanner-box'); if(s.style.display==='block'){s.style.display='none';if(qr)qr.stop();}else{s.style.display='block';qr=new Html5Qrcode("reader");qr.start({facingMode:"environment"},{fps:10},t=>{document.getElementById('target-id').value=t;toggleScan();});}};
 
         init();
         if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
