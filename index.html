@@ -16,225 +16,98 @@
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     
     <style>
-        /* --- 1. 精品级设计系统 (Premium Design System) --- */
+        /* --- V21.0 样式保持 V20 的精品风格 --- */
         :root {
-            /* 调色板：更高级的暖调白与深邃蓝 */
-            --bg-color: #F9F4EF; /* 暖纸色 */
-            --surface-glass: rgba(255, 255, 255, 0.75);
+            --bg-color: #F9F4EF; 
             --surface-solid: #FFFFFF;
-            
-            --primary: #2B6CB0; /* 专业深蓝 */
-            --primary-soft: #EBF8FF;
-            --text-main: #2D3748;
-            --text-sub: #718096;
-            
+            --primary: #2B6CB0; --primary-soft: #EBF8FF;
+            --text-main: #2D3748; --text-sub: #718096;
             --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.06);
-            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.01);
-            
-            --radius-L: 20px;
-            --radius-M: 14px;
-            
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.08);
+            --radius-L: 20px; --radius-M: 14px;
             --safe-bottom: env(safe-area-inset-bottom);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif; 
-            background: var(--bg-color); height: 100dvh; 
-            display: flex; flex-direction: column; overflow: hidden; 
-            color: var(--text-main); -webkit-font-smoothing: antialiased;
-        }
-
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; background: var(--bg-color); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); -webkit-font-smoothing: antialiased; }
         .icon { width: 22px; height: 22px; fill: currentColor; stroke-width: 2; }
 
-        /* --- 2. 导航栏 (毛玻璃) --- */
-        .navbar {
-            height: 56px; padding: 0 20px; 
-            background: rgba(249, 244, 239, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            display: flex; justify-content: space-between; align-items: center; 
-            z-index: 50; flex-shrink: 0; border-bottom: 1px solid rgba(0,0,0,0.03);
-        }
+        /* 导航栏 */
+        .navbar { height: 56px; padding: 0 20px; background: rgba(249, 244, 239, 0.85); backdrop-filter: blur(16px); display: flex; justify-content: space-between; align-items: center; z-index: 50; flex-shrink: 0; border-bottom: 1px solid rgba(0,0,0,0.03); }
         .brand { display: flex; align-items: center; gap: 12px; }
-        
-        /* 极致裁切：消除白边 */
-        .logo-box { 
-            width: 32px; height: 32px; border-radius: 50%; 
-            background: transparent; overflow: hidden; 
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: var(--shadow-sm);
-        }
+        .logo-box { width: 32px; height: 32px; border-radius: 50%; background: transparent; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); }
         .app-logo { width: 100%; height: 100%; object-fit: cover; }
-        
-        .app-name { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; color: var(--text-main); }
-        
-        .status-pill { 
-            font-size: 11px; padding: 4px 10px; border-radius: 12px; 
-            background: rgba(0,0,0,0.04); color: var(--text-sub); font-weight: 600; 
-            transition: 0.3s;
-        }
+        .app-name { font-size: 16px; font-weight: 700; color: var(--text-main); }
+        .status-pill { font-size: 11px; padding: 4px 10px; border-radius: 12px; background: rgba(0,0,0,0.04); color: var(--text-sub); font-weight: 600; }
         .status-pill.online { background: #C6F6D5; color: #22543D; }
 
-        /* --- 3. 主布局 --- */
+        /* 主容器 */
         .main-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; padding-bottom: 70px; }
 
-        /* 全屏拖拽遮罩 (极简风) */
-        .drag-overlay {
-            position: fixed; inset: 0; background: rgba(255,255,255,0.85); z-index: 999; 
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-            color: var(--primary); backdrop-filter: blur(8px);
-            pointer-events: none; /* 关键：穿透事件 */
-        }
+        /* 拖拽遮罩 */
+        .drag-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.85); z-index: 999; display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--primary); backdrop-filter: blur(8px); pointer-events: none; }
         .drag-overlay.active { display: flex; animation: fadeIn 0.2s; }
 
-        /* 投递区 (Paper Card 风格) */
+        /* 投递卡片 */
         .drop-zone-wrapper { padding: 16px 20px 0 20px; flex-shrink: 0; }
-        .drop-card {
-            height: 90px; background: var(--surface-solid); border-radius: var(--radius-L); 
-            border: 1px solid rgba(0,0,0,0.06);
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            cursor: pointer; color: var(--primary); 
-            box-shadow: var(--shadow-sm); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        .drop-card { height: 90px; background: var(--surface-solid); border-radius: var(--radius-L); border: 1px solid rgba(0,0,0,0.06); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: var(--primary); box-shadow: var(--shadow-sm); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .drop-card:active { transform: scale(0.98); background: var(--primary-soft); }
-        .drop-card.drag-active { 
-            border: 2px solid var(--primary); background: var(--primary-soft); 
-            box-shadow: var(--shadow-md); transform: scale(1.02);
-        }
+        .drop-card.drag-active { border: 2px solid var(--primary); background: var(--primary-soft); box-shadow: var(--shadow-md); transform: scale(1.02); }
         .drop-label { font-size: 13px; font-weight: 600; color: var(--text-sub); margin-top: 6px; }
 
         /* 聊天区 */
         .chat-scroll { flex: 1; padding: 16px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
-        .sys-notice { 
-            text-align: center; font-size: 12px; color: var(--text-sub); opacity: 0.6; 
-            margin: 10px 0; font-weight: 500;
-        }
+        .sys-notice { text-align: center; font-size: 12px; color: var(--text-sub); opacity: 0.6; margin: 10px 0; font-weight: 500; }
 
-        /* 消息气泡 (Modern) */
+        /* 消息气泡 */
         .msg-row { display: flex; width: 100%; margin-bottom: 2px; }
-        .msg-row.self { justify-content: flex-end; } 
-        .msg-row.peer { justify-content: flex-start; }
-        
-        .bubble { 
-            max-width: 85%; padding: 10px 14px; border-radius: var(--radius-M); 
-            font-size: 15px; line-height: 1.5; 
-            box-shadow: var(--shadow-sm);
-        }
+        .msg-row.self { justify-content: flex-end; } .msg-row.peer { justify-content: flex-start; }
+        .bubble { max-width: 85%; padding: 10px 14px; border-radius: var(--radius-M); font-size: 15px; line-height: 1.5; box-shadow: var(--shadow-sm); }
         .msg-row.self .bubble { background: var(--primary); color: white; border-bottom-right-radius: 4px; }
         .msg-row.peer .bubble { background: var(--surface-solid); color: var(--text-main); border-bottom-left-radius: 4px; }
 
-        /* 文件卡片 (精细化) */
+        /* 文件卡片 */
         .file-card { width: 240px; position: relative; }
-        .file-inner { 
-            background: var(--surface-solid); border-radius: 12px; padding: 10px; 
-            display: flex; align-items: center; gap: 12px; cursor: pointer; 
-            transition: background 0.2s;
-        }
-        .msg-row.self .file-inner { 
-            background: rgba(255,255,255,0.1); /* 深色背景下的半透明 */
-            border: 1px solid rgba(255,255,255,0.15); 
-        }
-        
-        .thumb-box { 
-            width: 44px; height: 44px; border-radius: 10px; background: #EDF2F7; 
-            display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; 
-        }
+        .file-inner { background: var(--surface-solid); border-radius: 12px; padding: 10px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; }
+        .msg-row.self .file-inner { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); }
+        .thumb-box { width: 44px; height: 44px; border-radius: 10px; background: #EDF2F7; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
         .thumb-img { width: 100%; height: 100%; object-fit: cover; }
         .msg-row.self .thumb-box { background: rgba(255,255,255,0.2); color: white; }
-
         .file-info { flex: 1; overflow: hidden; }
         .file-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .file-meta { font-size: 11px; opacity: 0.7; margin-top: 3px; display: flex; justify-content: space-between; font-weight: 500; }
         .msg-row.self .file-name, .msg-row.self .file-meta { color: white; }
-        
         .progress-bar { height: 3px; background: rgba(0,0,0,0.06); margin-top: 8px; border-radius: 2px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; background: var(--primary); transition: width 0.2s; }
         .msg-row.self .progress-fill { background: white; }
-
-        /* 预览按钮 */
-        .btn-preview { 
-            width: 34px; height: 34px; border-radius: 50%; background: var(--surface-solid); color: var(--primary); 
-            border: none; position: absolute; right: -10px; bottom: -10px; 
-            display: none; align-items: center; justify-content: center; 
-            box-shadow: var(--shadow-md); cursor: pointer; z-index: 10;
-            transition: transform 0.2s;
-        }
+        .btn-preview { width: 34px; height: 34px; border-radius: 50%; background: var(--surface-solid); color: var(--primary); border: none; position: absolute; right: -10px; bottom: -10px; display: none; align-items: center; justify-content: center; box-shadow: var(--shadow-md); cursor: pointer; z-index: 10; transition: transform 0.2s; }
         .btn-preview:active { transform: scale(0.9); }
 
-        /* 底部输入栏 (Glass) */
-        .input-area-wrapper { 
-            position: fixed; bottom: 0; left: 0; right: 0; 
-            background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            padding: 10px 16px; padding-bottom: max(10px, var(--safe-bottom)); 
-            z-index: 100; box-shadow: 0 -1px 0 rgba(0,0,0,0.05); 
-        }
+        /* 底部栏 */
+        .input-area-wrapper { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); padding: 10px 16px; padding-bottom: max(10px, var(--safe-bottom)); z-index: 100; box-shadow: 0 -1px 0 rgba(0,0,0,0.05); }
         .input-bar { display: flex; align-items: center; gap: 10px; height: 44px; }
-        
-        .btn-circle { 
-            width: 40px; height: 40px; border-radius: 50%; border: none; 
-            background: transparent; color: var(--text-sub); 
-            display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; flex-shrink: 0; transition: 0.2s;
-        }
+        .btn-circle { width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; color: var(--text-sub); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: 0.2s; }
         .btn-circle:active { background: rgba(0,0,0,0.05); }
-        .btn-circle svg { width: 26px; height: 26px; } /* 加大一点图标 */
-
-        .btn-voice { 
-            flex: 1; height: 42px; border-radius: 21px; border: none; 
-            background: #EDF2F7; color: var(--text-main); font-weight: 600; font-size: 15px;
-            transition: 0.2s;
-        }
+        .btn-voice { flex: 1; height: 42px; border-radius: 21px; border: none; background: #EDF2F7; color: var(--text-main); font-weight: 600; font-size: 15px; transition: 0.2s; }
         .btn-voice:active { background: #E2E8F0; }
         .btn-voice.recording { background: #FC8181; color: white; animation: pulse 1.5s infinite; }
-        
-        #msg-input { 
-            flex: 1; height: 42px; padding: 0 18px; border-radius: 21px; 
-            background: #EDF2F7; border: 1px solid transparent; outline: none; 
-            font-size: 16px; display: none; min-width: 0; color: var(--text-main);
-        }
+        #msg-input { flex: 1; height: 42px; padding: 0 18px; border-radius: 21px; background: #EDF2F7; border: 1px solid transparent; outline: none; font-size: 16px; display: none; min-width: 0; color: var(--text-main); }
         #msg-input:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.1); }
 
-        /* 连接弹窗 (Premium) */
-        .modal { 
-            position: fixed; inset: 0; background: rgba(249, 244, 239, 0.95); z-index: 200; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            backdrop-filter: blur(5px);
-        }
-        .card { 
-            width: 86%; max-width: 360px; background: var(--surface-solid); padding: 36px 28px; 
-            border-radius: 32px; text-align: center; 
-            box-shadow: var(--shadow-lg);
-        }
-        
-        .hero-crop {
-            width: 100px; height: 100px; margin: 0 auto 20px auto;
-            border-radius: 50%; background: transparent; 
-            box-shadow: var(--shadow-md); overflow: hidden; 
-            animation: float 4s ease-in-out infinite;
-        }
+        /* 连接弹窗 */
+        .modal { position: fixed; inset: 0; background: rgba(249, 244, 239, 0.95); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .card { width: 86%; max-width: 360px; background: var(--surface-solid); padding: 36px 28px; border-radius: 32px; text-align: center; box-shadow: var(--shadow-lg); }
+        .hero-crop { width: 100px; height: 100px; margin: 0 auto 20px auto; border-radius: 50%; background: transparent; box-shadow: var(--shadow-md); overflow: hidden; animation: float 4s ease-in-out infinite; }
         .hero-img { width: 100%; height: 100%; object-fit: cover; }
         @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
-
-        .id-display { 
-            background: #EDF2F7; padding: 12px; border-radius: 12px; margin: 16px 0; 
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; 
-            font-weight: 700; font-size: 18px; letter-spacing: 1px; color: var(--primary);
-        }
-        .input-id { 
-            width: 100%; height: 48px; border-radius: 16px; border: 2px solid #EDF2F7; 
-            text-align: center; font-size: 16px; font-weight: 600; margin-bottom: 20px; outline: none;
-            transition: 0.2s; background: #F7FAFC;
-        }
+        .id-display { background: #EDF2F7; padding: 12px; border-radius: 12px; margin: 16px 0; font-family: monospace; font-weight: 700; font-size: 18px; letter-spacing: 1px; color: var(--primary); }
+        .input-id { width: 100%; height: 48px; border-radius: 16px; border: 2px solid #EDF2F7; text-align: center; font-size: 16px; font-weight: 600; margin-bottom: 20px; outline: none; transition: 0.2s; background: #F7FAFC; }
         .input-id:focus { border-color: var(--primary); background: white; }
-        
-        .btn-block { 
-            width: 100%; height: 50px; border-radius: 16px; background: var(--primary); 
-            color: white; border: none; font-weight: 700; font-size: 16px; cursor: pointer;
-            box-shadow: 0 4px 12px rgba(43, 108, 176, 0.2); transition: 0.2s;
-        }
+        .btn-block { width: 100%; height: 50px; border-radius: 16px; background: var(--primary); color: white; border: none; font-weight: 700; font-size: 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(43, 108, 176, 0.2); transition: 0.2s; }
         .btn-block:active { transform: scale(0.98); }
         .btn-ghost { background: #EDF2F7; color: var(--text-main); box-shadow: none; }
+        #scanner-box { border-radius: 16px; overflow: hidden; margin-bottom: 15px; display: none; height: 240px; background: black; }
 
         /* 灯箱 */
         .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s ease-out; }
@@ -244,16 +117,9 @@
         .btn-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.25); width: 44px; height: 44px; border-radius: 50%; border:none; color:white; font-size:24px; z-index: 5001; cursor: pointer; backdrop-filter: blur(10px); }
 
         /* Toast */
-        #toast { 
-            position: fixed; top: 12px; left: 50%; transform: translateX(-50%) translateY(-20px); 
-            background: rgba(45, 55, 72, 0.95); color: white; padding: 10px 24px; 
-            border-radius: 30px; font-size: 14px; font-weight: 500; z-index: 6000; 
-            opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); backdrop-filter: blur(4px);
-        }
+        #toast { position: fixed; top: 12px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(45, 55, 72, 0.95); color: white; padding: 10px 24px; border-radius: 30px; font-size: 14px; font-weight: 500; z-index: 6000; opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); backdrop-filter: blur(4px); }
         #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         #toast.error { background: #E53E3E; }
-
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
     </style>
 </head>
@@ -274,8 +140,8 @@
             <h2 style="margin:0; font-size:22px; color:var(--text-main)">闪电快传</h2>
             <div id="qr-code" style="margin:24px auto; padding:10px; background:white; border-radius:16px; display:inline-block; min-height:100px;"></div>
             <div class="id-display" id="my-id">...</div>
-            <input type="text" id="target-id" class="input-id" placeholder="输入对方 ID" autocomplete="off">
-            <div id="scanner-box" style="display:none; height:240px; background:black; border-radius:16px; margin-bottom:20px; overflow:hidden;"><div id="reader" style="width:100%;height:100%"></div></div>
+            <input type="text" id="target-id" class="input-id" placeholder="输入对方 ID">
+            <div id="scanner-box" style="display:none;"><div id="reader" style="width:100%;height:100%"></div></div>
             <div style="display:flex; gap:12px;">
                 <button class="btn-block btn-ghost" onclick="toggleScan()" style="flex:1">📷</button>
                 <button class="btn-block" onclick="connect()" style="flex:2">连接</button>
@@ -300,11 +166,11 @@
         <div class="drop-zone-wrapper">
             <div class="drop-card" id="drop-zone">
                 <svg class="icon" style="width:36px;height:36px;margin-bottom:8px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                <span class="drop-label">点击或拖拽文件 (支持文件夹)</span>
+                <span class="drop-label">点击或拖拽文件 (多文件)</span>
             </div>
         </div>
         <div class="chat-scroll" id="chat-list">
-            <div class="sys-notice">V20.0 终极界面版</div>
+            <div class="sys-notice">V21.0 完美修复版</div>
         </div>
     </div>
 
@@ -314,7 +180,7 @@
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h2v2H6zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h2v2H6zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h12v2H6z"/></svg>
             </button>
             <button id="btn-voice" class="btn-voice">按住 说话</button>
-            <input id="msg-input" type="text" placeholder="输入消息..." autocomplete="off">
+            <input id="msg-input" type="text" placeholder="输入消息...">
             <button class="btn-circle" onclick="sendText()" id="btn-send" style="display:none; color:var(--primary);">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </button>
@@ -333,8 +199,8 @@
         }
 
         function init() {
-            App.id = localStorage.getItem('sloth_v20') || (Math.floor(Math.random()*9000)+1000).toString();
-            localStorage.setItem('sloth_v20', App.id);
+            App.id = localStorage.getItem('sloth_v21') || (Math.floor(Math.random()*9000)+1000).toString();
+            localStorage.setItem('sloth_v21', App.id);
             document.getElementById('my-id').innerText = App.id;
             const qr = document.getElementById("qr-code");
             if(qr && window.QRCode) new QRCode(qr, { text: App.id, width: 100, height: 100, colorDark: "#2B6CB0", colorLight: "#FFFFFF" });
@@ -375,7 +241,7 @@
         }
         function calcSpeed(bytes, ms) { return ms<=0?'':(bytes/ms*1000 > 1048576 ? (bytes/ms*1000/1048576).toFixed(1)+' MB/s' : (bytes/ms*1000/1024).toFixed(0)+' KB/s'); }
 
-        // --- V20 修复：递归与拖拽逻辑优化 ---
+        // --- 核心修复：同步收集 Entry，异步处理 ---
         const dragOverlay = document.getElementById('drag-overlay');
         const dropCard = document.getElementById('drop-zone');
         let dragCounter = 0;
@@ -388,28 +254,37 @@
             e.preventDefault(); 
             dragCounter=0; dragOverlay.classList.remove('active'); dropCard.classList.remove('drag-active');
             
-            const items = [...e.dataTransfer.items];
-            let list = [];
-            
-            // 核心修复：优先检查 webkitGetAsEntry
-            for(let i of items){
-                const ent = i.webkitGetAsEntry ? i.webkitGetAsEntry() : null;
-                if(ent) {
-                    list = list.concat(await scanEntry(ent)); // 如果是 entry，一定走递归
-                } else if(i.kind === 'file') {
-                    list.push(i.getAsFile()); // 兜底
+            // 1. 同步收集，防止 DataTransfer 失效
+            const items = e.dataTransfer.items;
+            const entries = [];
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].webkitGetAsEntry) {
+                    entries.push(items[i].webkitGetAsEntry());
                 }
             }
+
+            let list = [];
+            // 2. 异步递归处理
+            if (entries.length > 0) {
+                for (const ent of entries) {
+                    if (ent) list = list.concat(await scanEntry(ent));
+                }
+            } else {
+                // 兜底：直接读文件
+                list = [...e.dataTransfer.files];
+            }
+            
             if(list.length) enqueue(list);
             else showToast("无法识别文件", "error");
         });
 
-        // 递归逻辑
+        document.getElementById('drop-zone').onclick = () => document.getElementById('file-input').click();
+        document.getElementById('file-input').onchange = e => enqueue(e.target.files);
+
         async function scanEntry(entry) {
             if (entry.isFile) {
                 return new Promise(resolve => entry.file(f => resolve([f])));
-            } 
-            if (entry.isDirectory) {
+            } else if (entry.isDirectory) {
                 const reader = entry.createReader();
                 const entries = await new Promise((resolve, reject) => {
                     reader.readEntries(resolve, reject); 
@@ -422,9 +297,6 @@
             }
             return [];
         }
-
-        document.getElementById('drop-zone').onclick = () => document.getElementById('file-input').click();
-        document.getElementById('file-input').onchange = e => enqueue(e.target.files);
 
         function enqueue(files) {
             if(!App.connected) return showToast('请先连接设备', 'error');
