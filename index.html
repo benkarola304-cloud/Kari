@@ -40,6 +40,15 @@
         /* 主界面 */
         .main-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; padding-bottom: 70px; }
         
+        /* 核心修复：拖拽全屏遮罩 (添加 pointer-events: none) */
+        .drag-overlay {
+            position: absolute; inset: 0; background: rgba(255,255,255,0.9); z-index: 999; 
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            color: var(--primary); font-weight: bold; backdrop-filter: blur(5px);
+            pointer-events: none; /* <--- 关键修复：让鼠标事件穿透遮罩层 */
+        }
+        .drag-overlay.active { display: flex; }
+
         .drop-zone-wrapper { padding: 16px 20px 0 20px; flex-shrink: 0; transition: 0.2s; }
         .drop-card {
             height: 100px; background: var(--surface); border-radius: var(--radius-L); 
@@ -48,7 +57,6 @@
             box-shadow: 0 4px 12px rgba(62, 50, 40, 0.04); transition: all 0.2s ease;
         }
         .drop-card.drag-active { border: 2px solid var(--primary); background: #EBF5FF; transform: scale(1.02); }
-        /* 修复：移除乱码符号，纯文本 */
         .drop-label { font-size: 14px; font-weight: 600; color: var(--text-sub); margin-top: 8px; }
 
         .chat-scroll { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
@@ -81,7 +89,7 @@
 
         .btn-preview { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; border: none; position: absolute; right: -10px; bottom: -10px; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: pointer; z-index: 10; }
 
-        /* 底部栏 (移除 + 号) */
+        /* 底部栏 */
         .input-area-wrapper { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.98); padding: 8px 12px; padding-bottom: max(8px, var(--safe-bottom)); z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.02); }
         .input-bar { display: flex; align-items: center; gap: 8px; height: 44px; }
         .btn-circle { width: 40px; height: 40px; border-radius: 50%; border: none; background: #F2F0EB; color: var(--text-sub); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
@@ -99,21 +107,11 @@
         .input-id { width: 100%; height: 46px; border-radius: 14px; border: 2px solid #EEE; text-align: center; font-size: 16px; margin-bottom: 15px; outline: none;}
         .btn-block { width: 100%; height: 48px; border-radius: 14px; background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; }
         
-        /* 灯箱 (修复层级与显示) */
-        .lightbox { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.98); 
-            z-index: 5000; /* 极高层级，防止被覆盖 */
-            display: none; align-items: center; justify-content: center; 
-            opacity: 0; transition: opacity 0.3s;
-        }
+        /* 灯箱 */
+        .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 5000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
         .lightbox.active { display: flex; opacity: 1; }
-        
-        /* 媒体内容自适应 */
         .lightbox-content { max-width: 95%; max-height: 90vh; object-fit: contain; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        
-        /* PDF 专用容器 */
         .pdf-frame { width: 95%; height: 85vh; border: none; background: white; border-radius: 8px; }
-
         .btn-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 50%; border:none; color:white; font-size:24px; z-index: 5001; cursor: pointer; }
 
         /* Toast */
@@ -158,7 +156,7 @@
     </div>
 
     <div class="main-container">
-        <div class="drag-overlay" id="drag-overlay" style="display:none;position:absolute;inset:0;background:rgba(255,255,255,0.9);z-index:99;flex-direction:column;align-items:center;justify-content:center;color:var(--primary);font-weight:bold;">
+        <div class="drag-overlay" id="drag-overlay" style="display:none;position:absolute;inset:0;background:rgba(255,255,255,0.9);z-index:99;flex-direction:column;align-items:center;justify-content:center;color:var(--primary);font-weight:bold;pointer-events:none;">
             <div style="font-size:60px">📂</div>
             <div>松手 发送文件</div>
         </div>
@@ -170,7 +168,7 @@
             </div>
         </div>
         <div class="chat-scroll" id="chat-list">
-            <div class="sys-notice">V16.0 最终修复版</div>
+            <div class="sys-notice">V17.0 拖拽修正版</div>
         </div>
     </div>
 
@@ -195,8 +193,8 @@
         }
 
         function init() {
-            App.id = localStorage.getItem('sloth_v16') || (Math.floor(Math.random()*9000)+1000).toString();
-            localStorage.setItem('sloth_v16', App.id);
+            App.id = localStorage.getItem('sloth_v17') || (Math.floor(Math.random()*9000)+1000).toString();
+            localStorage.setItem('sloth_v17', App.id);
             document.getElementById('my-id').innerText = App.id;
             const qr = document.getElementById("qr-code");
             if(qr && window.QRCode) new QRCode(qr, { text: App.id, width: 100, height: 100, colorDark: "#2D7CA8", colorLight: "#FFFFFF" });
@@ -237,7 +235,7 @@
         }
         function calcSpeed(bytes, ms) { return ms<=0?'':(bytes/ms*1000 > 1048576 ? (bytes/ms*1000/1048576).toFixed(1)+' MB/s' : (bytes/ms*1000/1024).toFixed(0)+' KB/s'); }
 
-        // --- 拖拽 ---
+        // --- 拖拽逻辑修复 (pointer-events: none) ---
         const dragOverlay = document.getElementById('drag-overlay');
         let dragCounter = 0;
         document.addEventListener('dragenter', e => { e.preventDefault(); dragCounter++; dragOverlay.style.display='flex'; });
@@ -303,13 +301,9 @@
             el.querySelector('.progress-bar').style.display='none'; el.querySelector('.speed-tag').innerText='完成';
             const url = URL.createObjectURL(new Blob(Rx.buf, {type: mime})); Rx.buf = [];
             const inner = el.querySelector('.file-inner'), thumbBox = el.querySelector('.thumb-box'), btnPreview = el.querySelector('.btn-preview');
-            
-            // 点击文件主体：下载
             inner.onclick = () => { const a=document.createElement('a'); a.href=url; a.download='file'; a.click(); };
-
-            // 预览逻辑 (图片、视频、PDF)
             if (mime.includes('image')) {
-                thumbBox.innerHTML = `<img src="${url}" class="thumb-img">`; btnPreview.style.display = 'flex'; btnPreview.innerText = '👁️';
+                thumbBox.innerHTML = `<img src="${url}" class="thumb-img">`; btnPreview.style.display = 'flex';
                 btnPreview.onclick = (e) => { e.stopPropagation(); openLightbox(url, 'img'); };
             } else if (mime.includes('video')) {
                 const video = document.createElement('video'); video.src = url; video.currentTime = 1; video.className = 'thumb-img';
@@ -322,34 +316,26 @@
             }
         }
 
-        // --- 修复：灯箱逻辑 ---
+        // --- History API 修复灯箱 ---
         function openLightbox(url, type) {
             history.pushState({modal: 'lightbox'}, '', '#preview');
             const lb=document.getElementById('lightbox'), img=document.getElementById('lb-img'), vid=document.getElementById('lb-video'), pdf=document.getElementById('lb-pdf');
-            
-            // 重置所有
             img.style.display='none'; vid.style.display='none'; pdf.style.display='none';
-            lb.classList.add('active'); // 使用 class 控制显示，确保 flex 生效
-
+            lb.classList.add('active');
             if(type==='img') { img.src=url; img.style.display='block'; }
             else if(type==='video') { vid.src=url; vid.style.display='block'; vid.play(); }
             else if(type==='pdf') { pdf.src=url; pdf.style.display='block'; }
         }
-
         window.addEventListener('popstate', () => {
-            const lb = document.getElementById('lightbox');
-            lb.classList.remove('active');
-            document.getElementById('lb-video').pause();
-            document.getElementById('lb-pdf').src = ''; // 清空PDF防止后台加载
+            const lb = document.getElementById('lightbox'); lb.classList.remove('active');
+            document.getElementById('lb-video').pause(); document.getElementById('lb-pdf').src = '';
         });
-
         window.triggerClose = () => history.back();
 
         const bVoice=document.getElementById('btn-voice'); let mRec, chunks=[];
         const startR=async e=>{e.preventDefault();if(!App.connected)return;try{const s=await navigator.mediaDevices.getUserMedia({audio:true});mRec=new MediaRecorder(s);chunks=[];mRec.ondataavailable=e=>chunks.push(e.data);mRec.onstop=()=>enqueue([new File([new Blob(chunks)],"voice.webm",{type:'audio/webm'})]);mRec.start();bVoice.classList.add('recording');bVoice.innerText="松开 发送";}catch(e){showToast("麦克风错误", 'error');}};
         const stopR=e=>{e.preventDefault();if(mRec)mRec.stop();bVoice.classList.remove('recording');bVoice.innerText="按住 说话";}
         ['touchstart','mousedown'].forEach(k=>bVoice.addEventListener(k,startR)); ['touchend','mouseup'].forEach(k=>bVoice.addEventListener(k,stopR));
-        
         window.toggleInput=()=>{const t=document.getElementById('msg-input'), v=document.getElementById('btn-voice'), s=document.getElementById('btn-send'); if(t.style.display==='none'){t.style.display='block';v.style.display='none';s.style.display='block';t.focus();}else{t.style.display='none';v.style.display='block';s.style.display='none';}};
         window.sendText=()=>{const v=document.getElementById('msg-input').value;if(v){App.conn.send({type:'text',text:v});addMsg(v,'self');document.getElementById('msg-input').value='';}};
         function addMsg(t,w){const d=document.createElement('div');d.className=`msg-row ${w}`;d.innerHTML=`<div class="bubble">${t}</div>`;document.getElementById('chat-list').append(d);document.getElementById('chat-list').scrollTop=99999;}
