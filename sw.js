@@ -1,9 +1,9 @@
-const CACHE_NAME = 'sloth-premium-v6'; // 升级版本号
+const CACHE_NAME = 'sloth-final-v8'; // 升级版本号，强制浏览器重新下载图片
 const FILES = [
     './', 
     './index.html', 
     './manifest.json',
-    './Gemini_Generated_Image_lnxa7ilnxa7ilnxa.jpg', // 缓存图片
+    './sloth.jpg',
     'https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
     'https://unpkg.com/html5-qrcode'
