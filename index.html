@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#FFF8E7">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>闪电快传</title>
-    
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="./sloth.png">
     
@@ -31,17 +29,8 @@
             display: flex; justify-content: space-between; align-items: center; z-index: 50; flex-shrink: 0; border-bottom: 1px solid rgba(0,0,0,0.05);
         }
         .brand { display: flex; align-items: center; gap: 10px; }
-        
-        /* 顶部小图标：移除边框 */
-        .logo-box {
-            width: 38px; height: 38px; border-radius: 50%; 
-            background: transparent; /* 去掉白色背景 */
-            overflow: hidden; 
-            /* 移除 border */
-            display: flex; align-items: center; justify-content: center;
-        }
+        .logo-box { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .app-logo { width: 100%; height: 100%; object-fit: cover; }
-        
         .app-name { font-size: 17px; font-weight: 800; }
         .status-pill { font-size: 11px; padding: 5px 12px; border-radius: 20px; background: rgba(0,0,0,0.05); color: var(--text-sub); font-weight: 600; }
         .status-pill.online { background: #D1F2EB; color: #0E6251; }
@@ -49,23 +38,15 @@
         /* 主界面 */
         .main-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; padding-bottom: 70px; }
         
+        /* 投递区 */
         .drop-zone-wrapper { padding: 16px 20px 0 20px; flex-shrink: 0; transition: 0.2s; }
         .drop-card {
             height: 100px; background: var(--surface); border-radius: var(--radius-L); 
-            border: 2px dashed #E0D6CC; /* 默认虚线 */
-            display: flex; flex-direction: column; 
+            border: 2px dashed #E0D6CC; display: flex; flex-direction: column; 
             align-items: center; justify-content: center; cursor: pointer; color: var(--primary); 
             box-shadow: 0 4px 12px rgba(62, 50, 40, 0.04); transition: all 0.2s ease;
         }
-        
-        /* 拖拽激活时的样式：简约变蓝，不全屏遮挡 */
-        .drop-card.drag-active {
-            border: 2px solid var(--primary); /* 变实线 */
-            background: #EBF5FF; /* 变浅蓝 */
-            transform: scale(1.02); /* 轻微放大 */
-            box-shadow: 0 8px 20px rgba(45, 124, 168, 0.2);
-        }
-
+        .drop-card.drag-active { border: 2px solid var(--primary); background: #EBF5FF; transform: scale(1.02); }
         .drop-label { font-size: 14px; font-weight: 600; color: var(--text-sub); margin-top: 8px; }
 
         .chat-scroll { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
@@ -96,12 +77,7 @@
         .progress-fill { height: 100%; width: 0%; background: var(--primary); transition: width 0.2s; }
         .msg-row.self .progress-fill { background: white; }
 
-        .btn-preview {
-            width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white;
-            border: none; position: absolute; right: -10px; bottom: -10px;
-            display: none; align-items: center; justify-content: center; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: pointer; z-index: 10;
-        }
+        .btn-preview { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; border: none; position: absolute; right: -10px; bottom: -10px; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: pointer; z-index: 10; }
 
         /* 底部栏 */
         .input-area-wrapper { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.98); padding: 8px 12px; padding-bottom: max(8px, var(--safe-bottom)); z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.02); }
@@ -111,18 +87,14 @@
         .btn-voice.recording { background: #FF8F66; color: white; }
         #msg-input { flex: 1; height: 40px; border-radius: 20px; background: #F2F0EB; border: none; padding: 0 16px; display: none; }
 
-        /* 弹窗 & 加载动画修复 */
+        /* 弹窗 */
         .modal { position: fixed; inset: 0; background: #FFF8E7; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .card { width: 85%; max-width: 340px; background: white; padding: 30px 20px; border-radius: 28px; text-align: center; box-shadow: 0 12px 30px rgba(62,50,40,0.08); }
         
-        /* 核心修复：移除 border，保留裁切 */
         .hero-crop {
             width: 110px; height: 110px; margin: 0 auto 16px auto;
-            border-radius: 50%; 
-            /* border: 5px solid white;  <-- 删除这行，消除白框 */
-            background: transparent; 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            overflow: hidden; 
+            border-radius: 50%; background: transparent; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1); overflow: hidden; 
             animation: breathe 3s ease-in-out infinite;
         }
         .hero-img { width: 100%; height: 100%; object-fit: cover; }
@@ -137,9 +109,21 @@
         .lightbox-content { max-width: 100%; max-height: 100%; }
         .btn-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.3); width: 36px; height: 36px; border-radius: 50%; border:none; color:white; font-size:24px; z-index: 3001; }
 
+        /* Toast 提示 */
+        #toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: white; padding: 10px 20px;
+            border-radius: 20px; font-size: 14px; z-index: 5000;
+            opacity: 0; transition: opacity 0.3s; pointer-events: none;
+        }
+        #toast.show { opacity: 1; }
+        #toast.error { background: #E74C3C; }
+
     </style>
 </head>
 <body>
+
+    <div id="toast"></div>
 
     <div class="lightbox" id="lightbox" onclick="closeLightbox()">
         <button class="btn-close">×</button>
@@ -175,12 +159,12 @@
     <div class="main-container">
         <div class="drop-zone-wrapper">
             <div class="drop-card" id="drop-zone">
-                <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                <span class="drop-label">点击或拖拽 发送文件</span>
+                <svg class="icon-lg" style="width:32px;height:32px;margin-bottom:5px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                <span class="drop-label">点击或拖拽文件 (多文件)</span>
             </div>
         </div>
         <div class="chat-scroll" id="chat-list">
-            <div class="sys-notice">V13.0 简约拖拽版</div>
+            <div class="sys-notice">V14.0 强力修复版</div>
         </div>
     </div>
 
@@ -200,10 +184,19 @@
         
         document.addEventListener('DOMContentLoaded', () => setTimeout(init, 100));
 
+        // Toast 提示工具
+        function showToast(msg, type='normal') {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.className = type === 'error' ? 'error show' : 'show';
+            setTimeout(() => t.className = '', 3000);
+        }
+
         function init() {
-            App.id = localStorage.getItem('sloth_v13') || (Math.floor(Math.random()*9000)+1000).toString();
-            localStorage.setItem('sloth_v13', App.id);
+            App.id = localStorage.getItem('sloth_v14') || (Math.floor(Math.random()*9000)+1000).toString();
+            localStorage.setItem('sloth_v14', App.id);
             document.getElementById('my-id').innerText = App.id;
+            
             const qr = document.getElementById("qr-code");
             if(qr && window.QRCode) new QRCode(qr, { text: App.id, width: 100, height: 100, colorDark: "#2D7CA8", colorLight: "#FFFFFF" });
 
@@ -213,13 +206,9 @@
                 App.peer.on('connection', c => { if(confirm('连接 ID: '+c.peer+'?')) setupConn(c); });
                 App.peer.on('error', e => { 
                     console.error(e);
-                    // 自动重连提示
                     document.getElementById('status').innerText='重连中...';
                 });
-                // 心跳机制
-                setInterval(() => {
-                    if(App.conn && App.conn.open) App.conn.send({type:'ping'});
-                }, 3000);
+                setInterval(() => { if(App.conn && App.conn.open) App.conn.send({type:'ping'}); }, 3000);
             }
         }
 
@@ -227,14 +216,14 @@
             if(App.conn) App.conn.close(); App.conn = conn;
             conn.on('open', () => conn.send({ type: 'handshake' }));
             conn.on('data', handleData);
-            conn.on('close', () => { App.connected=false; document.getElementById('status').innerText='已断开'; });
+            conn.on('close', () => { App.connected=false; document.getElementById('status').innerText='已断开'; showToast('连接已断开', 'error'); });
         }
         function connect() { const t=document.getElementById('target-id').value.trim(); if(t) setupConn(App.peer.connect(t, {reliable:true})); }
 
         let Rx = { buf: [], size: 0, meta: null, lastLoaded: 0, lastTime: 0 };
         function handleData(data) {
             if (data.type) {
-                if(data.type==='handshake'){ App.connected=true; document.getElementById('modal').style.display='none'; document.getElementById('status').innerText='已连接'; document.getElementById('status').classList.add('online'); }
+                if(data.type==='handshake'){ App.connected=true; document.getElementById('modal').style.display='none'; document.getElementById('status').innerText='已连接'; document.getElementById('status').classList.add('online'); showToast('连接成功!'); }
                 else if(data.type==='text') addMsg(data.text, 'peer');
                 else if(data.type==='file-start') { Rx={buf:[],size:0,meta:data,lastLoaded:0,lastTime:Date.now()}; createFileItem(data.id, data.name, data.size, 'peer', data.mime); }
                 else if(data.type==='file-end') finishFile(data.id, Rx.meta.mime);
@@ -250,28 +239,45 @@
         }
         function calcSpeed(bytes, ms) { return ms<=0?'':(bytes/ms*1000 > 1048576 ? (bytes/ms*1000/1048576).toFixed(1)+' MB/s' : (bytes/ms*1000/1024).toFixed(0)+' KB/s'); }
 
-        // --- 拖拽逻辑 (修复版：不全屏遮挡，直接触发) ---
+        // --- 核心：重写拖拽逻辑 (V14) ---
         const dropCard = document.getElementById('drop-zone');
         let dragCounter = 0;
 
-        // 监听整个窗口，但只高亮 drop-card
-        window.addEventListener('dragenter', e => { e.preventDefault(); dragCounter++; dropCard.classList.add('drag-active'); });
-        window.addEventListener('dragleave', e => { e.preventDefault(); dragCounter--; if(dragCounter===0) dropCard.classList.remove('drag-active'); });
-        window.addEventListener('dragover', e => e.preventDefault());
+        document.addEventListener('dragenter', e => { e.preventDefault(); dragCounter++; dropCard.classList.add('drag-active'); });
+        document.addEventListener('dragleave', e => { e.preventDefault(); dragCounter--; if(dragCounter===0) dropCard.classList.remove('drag-active'); });
+        document.addEventListener('dragover', e => e.preventDefault());
         
-        window.addEventListener('drop', async e => {
+        document.addEventListener('drop', async e => {
             e.preventDefault(); 
             dragCounter = 0; 
-            dropCard.classList.remove('drag-active'); // 恢复原样
+            dropCard.classList.remove('drag-active');
             
-            // 立即获取文件
-            const items = [...e.dataTransfer.items], list = [];
-            for (let i of items) {
-                const ent = i.webkitGetAsEntry ? i.webkitGetAsEntry() : null;
-                if (ent) list = list.concat(await scanEntry(ent));
-                else if (i.kind === 'file') list.push(i.getAsFile());
+            // 策略1：优先尝试获取文件对象
+            let files = [];
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                for (let i = 0; i < e.dataTransfer.files.length; i++) {
+                    files.push(e.dataTransfer.files[i]);
+                }
             }
-            if(list.length) enqueue(list);
+            
+            // 策略2：尝试解析文件夹 (如果有)
+            if (files.length === 0 && e.dataTransfer.items) {
+                const items = [...e.dataTransfer.items];
+                for (let i of items) {
+                    const ent = i.webkitGetAsEntry ? i.webkitGetAsEntry() : null;
+                    if (ent) {
+                        const scanned = await scanEntry(ent);
+                        files = files.concat(scanned);
+                    }
+                }
+            }
+
+            if (files.length > 0) {
+                showToast(`准备发送 ${files.length} 个文件`);
+                enqueue(files);
+            } else {
+                showToast('未能识别文件，请重试', 'error');
+            }
         });
 
         document.getElementById('drop-zone').onclick = () => document.getElementById('file-input').click();
@@ -279,7 +285,10 @@
         async function scanEntry(e){ if(e.isFile)return new Promise(r=>e.file(f=>r([f]))); if(e.isDirectory){const r=e.createReader();const ents=await new Promise(res=>r.readEntries(res));let a=[];for(let s of ents)a=a.concat(await scanEntry(s));return a;} return []; }
 
         function enqueue(files) {
-            if(!App.connected) return alert('请先连接');
+            if(!App.connected) {
+                showToast('请先连接设备!', 'error');
+                return;
+            }
             Array.from(files).forEach(f => { const id = 'f-'+Date.now()+Math.random().toString(36).substr(2); createFileItem(id, f.name, f.size, 'self', f.type); App.queue.push({f, id}); });
             process();
         }
@@ -346,9 +355,8 @@
         }
         window.closeLightbox = () => { document.getElementById('lightbox').classList.remove('active'); document.getElementById('lb-video').pause(); };
         
-        // 杂项
         const bVoice=document.getElementById('btn-voice'); let mRec, chunks=[];
-        const startR=async e=>{e.preventDefault();if(!App.connected)return;try{const s=await navigator.mediaDevices.getUserMedia({audio:true});mRec=new MediaRecorder(s);chunks=[];mRec.ondataavailable=e=>chunks.push(e.data);mRec.onstop=()=>enqueue([new File([new Blob(chunks)],"voice.webm",{type:'audio/webm'})]);mRec.start();bVoice.classList.add('recording');bVoice.innerText="松开 发送";}catch(e){alert("麦克风错误");}};
+        const startR=async e=>{e.preventDefault();if(!App.connected)return;try{const s=await navigator.mediaDevices.getUserMedia({audio:true});mRec=new MediaRecorder(s);chunks=[];mRec.ondataavailable=e=>chunks.push(e.data);mRec.onstop=()=>enqueue([new File([new Blob(chunks)],"voice.webm",{type:'audio/webm'})]);mRec.start();bVoice.classList.add('recording');bVoice.innerText="松开 发送";}catch(e){showToast("麦克风错误", 'error');}};
         const stopR=e=>{e.preventDefault();if(mRec)mRec.stop();bVoice.classList.remove('recording');bVoice.innerText="按住 说话";}
         ['touchstart','mousedown'].forEach(k=>bVoice.addEventListener(k,startR)); ['touchend','mouseup'].forEach(k=>bVoice.addEventListener(k,stopR));
         window.toggleInput=()=>{const t=document.getElementById('msg-input'), v=document.getElementById('btn-voice'), s=document.getElementById('btn-send'), p=document.getElementById('btn-plus'); if(t.style.display==='none'){t.style.display='block';v.style.display='none';s.style.display='block';p.style.display='none';t.focus();}else{t.style.display='none';v.style.display='flex';s.style.display='none';p.style.display='flex';}};
