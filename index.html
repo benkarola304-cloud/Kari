@@ -25,42 +25,48 @@
         body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-main); }
         .icon { width: 24px; height: 24px; fill: currentColor; }
         
-        /* --- 导航栏 --- */
+        /* 导航栏 */
         .navbar {
-            height: 60px; padding: 0 16px; 
-            background: rgba(255, 248, 231, 0.95); /* 增加不透明度防止透视 */
-            display: flex; justify-content: space-between; align-items: center; 
-            z-index: 50; flex-shrink: 0; border-bottom: 1px solid rgba(0,0,0,0.05);
+            height: 60px; padding: 0 16px; background: rgba(255, 248, 231, 0.95);
+            display: flex; justify-content: space-between; align-items: center; z-index: 50; flex-shrink: 0; border-bottom: 1px solid rgba(0,0,0,0.05);
         }
         .brand { display: flex; align-items: center; gap: 10px; }
         
-        /* 修复图标：强制圆形裁切容器 */
+        /* 顶部小图标：移除边框 */
         .logo-box {
-            width: 38px; height: 38px; 
-            border-radius: 50%; 
-            background: white; /* 强制白色背景 */
-            overflow: hidden; /* 物理裁切掉多余部分 */
-            border: 2px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 38px; height: 38px; border-radius: 50%; 
+            background: transparent; /* 去掉白色背景 */
+            overflow: hidden; 
+            /* 移除 border */
             display: flex; align-items: center; justify-content: center;
         }
-        /* 图片稍微放大一点(105%)以填满圆角，防止白边 */
-        .app-logo { width: 105%; height: 105%; object-fit: cover; }
+        .app-logo { width: 100%; height: 100%; object-fit: cover; }
         
         .app-name { font-size: 17px; font-weight: 800; }
         .status-pill { font-size: 11px; padding: 5px 12px; border-radius: 20px; background: rgba(0,0,0,0.05); color: var(--text-sub); font-weight: 600; }
         .status-pill.online { background: #D1F2EB; color: #0E6251; }
 
-        /* --- 主界面 --- */
+        /* 主界面 */
         .main-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; padding-bottom: 70px; }
         
-        /* 全屏拖拽遮罩 (修复PC拖拽) */
-        .drag-overlay {
-            position: fixed; inset: 0; background: rgba(45, 124, 168, 0.9); z-index: 9999; 
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-            color: white; font-weight: bold; font-size: 24px;
+        .drop-zone-wrapper { padding: 16px 20px 0 20px; flex-shrink: 0; transition: 0.2s; }
+        .drop-card {
+            height: 100px; background: var(--surface); border-radius: var(--radius-L); 
+            border: 2px dashed #E0D6CC; /* 默认虚线 */
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; cursor: pointer; color: var(--primary); 
+            box-shadow: 0 4px 12px rgba(62, 50, 40, 0.04); transition: all 0.2s ease;
         }
-        .drag-overlay.active { display: flex; animation: fadeIn 0.2s; }
+        
+        /* 拖拽激活时的样式：简约变蓝，不全屏遮挡 */
+        .drop-card.drag-active {
+            border: 2px solid var(--primary); /* 变实线 */
+            background: #EBF5FF; /* 变浅蓝 */
+            transform: scale(1.02); /* 轻微放大 */
+            box-shadow: 0 8px 20px rgba(45, 124, 168, 0.2);
+        }
+
+        .drop-label { font-size: 14px; font-weight: 600; color: var(--text-sub); margin-top: 8px; }
 
         .chat-scroll { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
         .sys-notice { text-align: center; font-size: 12px; color: var(--text-sub); opacity: 0.6; margin: 10px 0; }
@@ -74,16 +80,10 @@
 
         /* 文件卡片 */
         .file-card { width: 240px; position: relative; }
-        .file-inner { 
-            background: var(--surface); border-radius: 12px; padding: 10px; 
-            display: flex; align-items: center; gap: 10px; cursor: pointer;
-        }
+        .file-inner { background: var(--surface); border-radius: 12px; padding: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
         .msg-row.self .file-inner { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); }
         
-        .thumb-box { 
-            width: 48px; height: 48px; border-radius: 8px; background: #F3F4F6; 
-            display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; 
-        }
+        .thumb-box { width: 48px; height: 48px; border-radius: 8px; background: #F3F4F6; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
         .thumb-img { width: 100%; height: 100%; object-fit: cover; }
         .msg-row.self .thumb-box { background: rgba(255,255,255,0.2); color: white; }
 
@@ -96,7 +96,6 @@
         .progress-fill { height: 100%; width: 0%; background: var(--primary); transition: width 0.2s; }
         .msg-row.self .progress-fill { background: white; }
 
-        /* 预览按钮 */
         .btn-preview {
             width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white;
             border: none; position: absolute; right: -10px; bottom: -10px;
@@ -112,32 +111,31 @@
         .btn-voice.recording { background: #FF8F66; color: white; }
         #msg-input { flex: 1; height: 40px; border-radius: 20px; background: #F2F0EB; border: none; padding: 0 16px; display: none; }
 
-        /* --- 弹窗 (修复白框) --- */
+        /* 弹窗 & 加载动画修复 */
         .modal { position: fixed; inset: 0; background: #FFF8E7; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .card { width: 85%; max-width: 340px; background: white; padding: 30px 20px; border-radius: 28px; text-align: center; box-shadow: 0 12px 30px rgba(62,50,40,0.08); }
         
-        /* 启动动画容器 */
+        /* 核心修复：移除 border，保留裁切 */
         .hero-crop {
             width: 110px; height: 110px; margin: 0 auto 16px auto;
-            border-radius: 50%; border: 5px solid white;
-            background: white; /* 确保背景是白的 */
+            border-radius: 50%; 
+            /* border: 5px solid white;  <-- 删除这行，消除白框 */
+            background: transparent; 
             box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            overflow: hidden; /* 物理裁切方框 */
+            overflow: hidden; 
             animation: breathe 3s ease-in-out infinite;
         }
-        .hero-img { width: 105%; height: 105%; object-fit: cover; margin-left: -2.5%; margin-top: -2.5%; }
+        .hero-img { width: 100%; height: 100%; object-fit: cover; }
         @keyframes breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
 
         .id-display { background: #F5F7FA; padding: 10px; border-radius: 10px; margin: 15px 0; font-family: monospace; font-weight: bold; font-size: 18px; }
         .input-id { width: 100%; height: 46px; border-radius: 14px; border: 2px solid #EEE; text-align: center; font-size: 16px; margin-bottom: 15px; outline: none;}
         .btn-block { width: 100%; height: 48px; border-radius: 14px; background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; }
         
-        /* 灯箱 */
         .lightbox { position: fixed; inset: 0; background: black; z-index: 3000; display: none; align-items: center; justify-content: center; }
         .lightbox.active { display: flex; }
         .lightbox-content { max-width: 100%; max-height: 100%; }
         .btn-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.3); width: 36px; height: 36px; border-radius: 50%; border:none; color:white; font-size:24px; z-index: 3001; }
-        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
 
     </style>
 </head>
@@ -168,27 +166,21 @@
 
     <div class="navbar">
         <div class="brand">
-            <div class="logo-box">
-                <img src="./sloth.png" class="app-logo">
-            </div>
+            <div class="logo-box"><img src="./sloth.png" class="app-logo"></div>
             <span class="app-name">闪电快传</span>
         </div>
         <div class="status-pill" id="status">离线</div>
     </div>
 
     <div class="main-container">
-        <div class="drag-overlay" id="drag-overlay">
-            <div style="font-size:60px; margin-bottom:20px">📂</div>
-            <div>松手 发送文件</div>
-        </div>
-        
-        <div style="padding:16px 20px 0 20px;">
-            <div id="drop-trigger" style="height:80px; border:2px dashed #E0D6CC; border-radius:24px; display:flex; align-items:center; justify-content:center; color:var(--primary); font-weight:bold; cursor:pointer; background:white;">
-                点击或拖拽 发送文件
+        <div class="drop-zone-wrapper">
+            <div class="drop-card" id="drop-zone">
+                <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                <span class="drop-label">点击或拖拽 发送文件</span>
             </div>
         </div>
         <div class="chat-scroll" id="chat-list">
-            <div class="sys-notice">V12.0 修复: 白框 / 重影 / 断连</div>
+            <div class="sys-notice">V13.0 简约拖拽版</div>
         </div>
     </div>
 
@@ -204,15 +196,14 @@
     <input type="file" id="file-input" multiple style="display:none">
 
     <script>
-        const App = { id: null, peer: null, conn: null, connected: false, queue: [], isSending: false, lastPing: 0 };
+        const App = { id: null, peer: null, conn: null, connected: false, queue: [], isSending: false };
         
         document.addEventListener('DOMContentLoaded', () => setTimeout(init, 100));
 
         function init() {
-            App.id = localStorage.getItem('sloth_v12') || (Math.floor(Math.random()*9000)+1000).toString();
-            localStorage.setItem('sloth_v12', App.id);
+            App.id = localStorage.getItem('sloth_v13') || (Math.floor(Math.random()*9000)+1000).toString();
+            localStorage.setItem('sloth_v13', App.id);
             document.getElementById('my-id').innerText = App.id;
-            
             const qr = document.getElementById("qr-code");
             if(qr && window.QRCode) new QRCode(qr, { text: App.id, width: 100, height: 100, colorDark: "#2D7CA8", colorLight: "#FFFFFF" });
 
@@ -220,17 +211,14 @@
                 App.peer = new Peer(App.id, { debug: 1 });
                 App.peer.on('open', () => document.getElementById('status').innerText='等待连接');
                 App.peer.on('connection', c => { if(confirm('连接 ID: '+c.peer+'?')) setupConn(c); });
-                App.peer.on('error', e => {
-                    // 修复：断连时不立即弹窗，而是显示重连状态
-                    console.log('Peer error', e);
-                    document.getElementById('status').innerText = '重连中...';
-                    setTimeout(() => location.reload(), 3000); 
+                App.peer.on('error', e => { 
+                    console.error(e);
+                    // 自动重连提示
+                    document.getElementById('status').innerText='重连中...';
                 });
-                // 心跳保活
+                // 心跳机制
                 setInterval(() => {
-                    if(App.connected && App.conn && App.conn.open) {
-                        App.conn.send({type: 'ping'});
-                    }
+                    if(App.conn && App.conn.open) App.conn.send({type:'ping'});
                 }, 3000);
             }
         }
@@ -239,31 +227,16 @@
             if(App.conn) App.conn.close(); App.conn = conn;
             conn.on('open', () => conn.send({ type: 'handshake' }));
             conn.on('data', handleData);
-            conn.on('close', () => { 
-                App.connected = false; 
-                document.getElementById('status').innerText='已断开';
-                alert('连接已断开，请重新连接');
-                location.reload(); 
-            });
+            conn.on('close', () => { App.connected=false; document.getElementById('status').innerText='已断开'; });
         }
         function connect() { const t=document.getElementById('target-id').value.trim(); if(t) setupConn(App.peer.connect(t, {reliable:true})); }
 
         let Rx = { buf: [], size: 0, meta: null, lastLoaded: 0, lastTime: 0 };
-        
         function handleData(data) {
             if (data.type) {
-                if(data.type==='handshake'){ 
-                    App.connected=true; 
-                    document.getElementById('modal').style.display='none'; // 强制隐藏防止重影
-                    document.getElementById('status').innerText='已连接'; 
-                    document.getElementById('status').classList.add('online'); 
-                }
-                else if(data.type==='ping') { /* 心跳响应，不做操作 */ }
+                if(data.type==='handshake'){ App.connected=true; document.getElementById('modal').style.display='none'; document.getElementById('status').innerText='已连接'; document.getElementById('status').classList.add('online'); }
                 else if(data.type==='text') addMsg(data.text, 'peer');
-                else if(data.type==='file-start') { 
-                    Rx = { buf:[], size:0, meta:data, lastLoaded:0, lastTime:Date.now() }; 
-                    createFileItem(data.id, data.name, data.size, 'peer', data.mime); 
-                }
+                else if(data.type==='file-start') { Rx={buf:[],size:0,meta:data,lastLoaded:0,lastTime:Date.now()}; createFileItem(data.id, data.name, data.size, 'peer', data.mime); }
                 else if(data.type==='file-end') finishFile(data.id, Rx.meta.mime);
             } else {
                 Rx.buf.push(data); Rx.size += data.byteLength;
@@ -275,24 +248,23 @@
                 }
             }
         }
+        function calcSpeed(bytes, ms) { return ms<=0?'':(bytes/ms*1000 > 1048576 ? (bytes/ms*1000/1048576).toFixed(1)+' MB/s' : (bytes/ms*1000/1024).toFixed(0)+' KB/s'); }
 
-        function calcSpeed(bytes, ms) {
-            if(ms <= 0) return '';
-            const bps = (bytes / ms) * 1000;
-            return bps > 1048576 ? (bps/1048576).toFixed(1)+' MB/s' : (bps/1024).toFixed(0)+' KB/s';
-        }
-
-        // --- 修复：全局拖拽监听 ---
-        const dragOverlay = document.getElementById('drag-overlay');
+        // --- 拖拽逻辑 (修复版：不全屏遮挡，直接触发) ---
+        const dropCard = document.getElementById('drop-zone');
         let dragCounter = 0;
-        
-        // 监听整个 window
-        window.addEventListener('dragenter', e => { e.preventDefault(); dragCounter++; dragOverlay.classList.add('active'); });
-        window.addEventListener('dragleave', e => { e.preventDefault(); dragCounter--; if(dragCounter===0) dragOverlay.classList.remove('active'); });
+
+        // 监听整个窗口，但只高亮 drop-card
+        window.addEventListener('dragenter', e => { e.preventDefault(); dragCounter++; dropCard.classList.add('drag-active'); });
+        window.addEventListener('dragleave', e => { e.preventDefault(); dragCounter--; if(dragCounter===0) dropCard.classList.remove('drag-active'); });
         window.addEventListener('dragover', e => e.preventDefault());
         
         window.addEventListener('drop', async e => {
-            e.preventDefault(); dragCounter = 0; dragOverlay.classList.remove('active');
+            e.preventDefault(); 
+            dragCounter = 0; 
+            dropCard.classList.remove('drag-active'); // 恢复原样
+            
+            // 立即获取文件
             const items = [...e.dataTransfer.items], list = [];
             for (let i of items) {
                 const ent = i.webkitGetAsEntry ? i.webkitGetAsEntry() : null;
@@ -301,30 +273,21 @@
             }
             if(list.length) enqueue(list);
         });
-        
-        document.getElementById('drop-trigger').onclick = () => document.getElementById('file-input').click();
+
+        document.getElementById('drop-zone').onclick = () => document.getElementById('file-input').click();
         document.getElementById('file-input').onchange = e => enqueue(e.target.files);
         async function scanEntry(e){ if(e.isFile)return new Promise(r=>e.file(f=>r([f]))); if(e.isDirectory){const r=e.createReader();const ents=await new Promise(res=>r.readEntries(res));let a=[];for(let s of ents)a=a.concat(await scanEntry(s));return a;} return []; }
 
         function enqueue(files) {
             if(!App.connected) return alert('请先连接');
-            Array.from(files).forEach(f => {
-                const id = 'f-'+Date.now()+Math.random().toString(36).substr(2);
-                createFileItem(id, f.name, f.size, 'self', f.type);
-                App.queue.push({f, id});
-            });
+            Array.from(files).forEach(f => { const id = 'f-'+Date.now()+Math.random().toString(36).substr(2); createFileItem(id, f.name, f.size, 'self', f.type); App.queue.push({f, id}); });
             process();
         }
         function process() { if(App.isSending || !App.queue.length) return; App.isSending=true; sendFile(App.queue.shift()); }
-        
         function sendFile({f, id}) {
             App.conn.send({type:'file-start', id, name:f.name, size:f.size, mime:f.type});
             const reader = new FileReader(); let offset=0; let lastTime=Date.now(); let lastLoaded=0;
-            const push = () => {
-                if(App.conn.dataChannel.bufferedAmount > 65536) { setTimeout(push, 20); return; }
-                const slice = f.slice(offset, offset + 32768);
-                reader.readAsArrayBuffer(slice);
-            };
+            const push = () => { if(App.conn.dataChannel.bufferedAmount > 65536) { setTimeout(push, 20); return; } const s = f.slice(offset, offset + 32768); reader.readAsArrayBuffer(s); };
             reader.onload = e => {
                 App.conn.send(e.target.result); offset += e.target.result.byteLength;
                 const now = Date.now();
@@ -333,8 +296,7 @@
                     updateProgress(id, offset, f.size, speed);
                     lastLoaded = offset; lastTime = now;
                 }
-                if(offset < f.size) setTimeout(push, 0);
-                else { App.conn.send({type:'file-end', id}); App.isSending=false; setTimeout(process, 100); }
+                if(offset < f.size) setTimeout(push, 0); else { App.conn.send({type:'file-end', id}); App.isSending=false; setTimeout(process, 100); }
             };
             push();
         }
@@ -357,70 +319,42 @@
             document.getElementById('chat-list').append(div);
             document.getElementById('chat-list').scrollTop = 99999;
         }
-
         function updateProgress(id, cur, tot, speed) {
             const el = document.getElementById(`msg-${id}`);
-            if(el) {
-                el.querySelector('.progress-fill').style.width = (cur/tot*100)+'%';
-                if(speed) el.querySelector('.speed-tag').innerText = speed;
-            }
+            if(el) { el.querySelector('.progress-fill').style.width = (cur/tot*100)+'%'; if(speed) el.querySelector('.speed-tag').innerText = speed; }
         }
-
         function finishFile(id, mime) {
             const el = document.getElementById(`msg-${id}`); if(!el) return;
-            el.querySelector('.progress-bar').style.display='none';
-            el.querySelector('.speed-tag').innerText = '完成';
+            el.querySelector('.progress-bar').style.display='none'; el.querySelector('.speed-tag').innerText='完成';
             const url = URL.createObjectURL(new Blob(Rx.buf, {type: mime})); Rx.buf = [];
-            const inner = el.querySelector('.file-inner');
-            const thumbBox = el.querySelector('.thumb-box');
-            const btnPreview = el.querySelector('.btn-preview');
-
+            const inner = el.querySelector('.file-inner'), thumbBox = el.querySelector('.thumb-box'), btnPreview = el.querySelector('.btn-preview');
             inner.onclick = () => { const a=document.createElement('a'); a.href=url; a.download='file'; a.click(); };
-
             if (mime.includes('image')) {
-                thumbBox.innerHTML = `<img src="${url}" class="thumb-img">`;
-                btnPreview.style.display = 'flex';
+                thumbBox.innerHTML = `<img src="${url}" class="thumb-img">`; btnPreview.style.display = 'flex';
                 btnPreview.onclick = (e) => { e.stopPropagation(); openLightbox(url, 'img'); };
-            } 
-            else if (mime.includes('video')) {
-                const video = document.createElement('video');
-                video.src = url; video.currentTime = 1; 
-                video.className = 'thumb-img';
+            } else if (mime.includes('video')) {
+                const video = document.createElement('video'); video.src = url; video.currentTime = 1; video.className = 'thumb-img';
                 thumbBox.innerHTML = ''; thumbBox.appendChild(video);
                 btnPreview.innerHTML = '▶'; btnPreview.style.display = 'flex';
                 btnPreview.onclick = (e) => { e.stopPropagation(); openLightbox(url, 'video'); };
             }
         }
-
         function openLightbox(url, type) {
             const lb=document.getElementById('lightbox'), img=document.getElementById('lb-img'), vid=document.getElementById('lb-video');
             img.style.display='none'; vid.style.display='none'; lb.classList.add('active');
-            if(type==='img') { img.src=url; img.style.display='block'; }
-            else { vid.src=url; vid.style.display='block'; vid.play(); }
+            if(type==='img') { img.src=url; img.style.display='block'; } else { vid.src=url; vid.style.display='block'; vid.play(); }
         }
         window.closeLightbox = () => { document.getElementById('lightbox').classList.remove('active'); document.getElementById('lb-video').pause(); };
-
+        
+        // 杂项
         const bVoice=document.getElementById('btn-voice'); let mRec, chunks=[];
-        bVoice.onmousedown = bVoice.ontouchstart = async (e) => {
-            e.preventDefault(); if(!App.connected) return;
-            try {
-                const s = await navigator.mediaDevices.getUserMedia({audio:true});
-                mRec = new MediaRecorder(s); chunks=[];
-                mRec.ondataavailable = e => chunks.push(e.data);
-                mRec.onstop = () => enqueue([new File([new Blob(chunks)], "voice.webm", {type:'audio/webm'})]);
-                mRec.start(); bVoice.classList.add('recording'); bVoice.innerText="松开 发送";
-            } catch(e) { alert("麦克风错误: "+e); }
-        }
-        bVoice.onmouseup = bVoice.ontouchend = (e) => { e.preventDefault(); if(mRec) mRec.stop(); bVoice.classList.remove('recording'); bVoice.innerText="按住 说话"; }
-
-        window.toggleInput = () => {
-            const t=document.getElementById('msg-input'), v=document.getElementById('btn-voice'), s=document.getElementById('btn-send'), p=document.getElementById('btn-plus');
-            if(t.style.display==='none'){ t.style.display='block'; v.style.display='none'; s.style.display='block'; p.style.display='none'; t.focus(); } 
-            else{ t.style.display='none'; v.style.display='flex'; s.style.display='none'; p.style.display='flex'; }
-        }
-        window.sendText = () => { const v=document.getElementById('msg-input').value; if(v){ App.conn.send({type:'text',text:v}); addMsg(v,'self'); document.getElementById('msg-input').value=''; } }
-        function addMsg(t,w){ const d=document.createElement('div'); d.className=`msg-row ${w}`; d.innerHTML=`<div class="bubble">${t}</div>`; document.getElementById('chat-list').append(d); document.getElementById('chat-list').scrollTop=99999; }
-        let qr; window.toggleScan=()=>{ const s=document.getElementById('scanner-box'); if(s.style.display==='block'){s.style.display='none';if(qr)qr.stop();}else{s.style.display='block';qr=new Html5Qrcode("reader");qr.start({facingMode:"environment"},{fps:10},t=>{document.getElementById('target-id').value=t;toggleScan();});}};
+        const startR=async e=>{e.preventDefault();if(!App.connected)return;try{const s=await navigator.mediaDevices.getUserMedia({audio:true});mRec=new MediaRecorder(s);chunks=[];mRec.ondataavailable=e=>chunks.push(e.data);mRec.onstop=()=>enqueue([new File([new Blob(chunks)],"voice.webm",{type:'audio/webm'})]);mRec.start();bVoice.classList.add('recording');bVoice.innerText="松开 发送";}catch(e){alert("麦克风错误");}};
+        const stopR=e=>{e.preventDefault();if(mRec)mRec.stop();bVoice.classList.remove('recording');bVoice.innerText="按住 说话";}
+        ['touchstart','mousedown'].forEach(k=>bVoice.addEventListener(k,startR)); ['touchend','mouseup'].forEach(k=>bVoice.addEventListener(k,stopR));
+        window.toggleInput=()=>{const t=document.getElementById('msg-input'), v=document.getElementById('btn-voice'), s=document.getElementById('btn-send'), p=document.getElementById('btn-plus'); if(t.style.display==='none'){t.style.display='block';v.style.display='none';s.style.display='block';p.style.display='none';t.focus();}else{t.style.display='none';v.style.display='flex';s.style.display='none';p.style.display='flex';}};
+        window.sendText=()=>{const v=document.getElementById('msg-input').value;if(v){App.conn.send({type:'text',text:v});addMsg(v,'self');document.getElementById('msg-input').value='';}};
+        function addMsg(t,w){const d=document.createElement('div');d.className=`msg-row ${w}`;d.innerHTML=`<div class="bubble">${t}</div>`;document.getElementById('chat-list').append(d);document.getElementById('chat-list').scrollTop=99999;}
+        let qr; window.toggleScan=()=>{const s=document.getElementById('scanner-box');if(s.style.display==='block'){s.style.display='none';if(qr)qr.stop();}else{s.style.display='block';qr=new Html5Qrcode("reader");qr.start({facingMode:"environment"},{fps:10},t=>{document.getElementById('target-id').value=t;toggleScan();});}};
     </script>
 </body>
 </html>
